@@ -37,6 +37,89 @@
 ;Delimitadores
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;nueva ventana
-(copy-viewport CampoJugadores ventanaPrincipal)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Creacion de jugadores
+;posx => posicion en x
+;posy => posicion en y
+;lad => tecla que mueve el jugador, Preguntar al profe(aqui creo que va el algoritmo genetico)
+(define (jugadores posx posy lad )
+  (if (equal? lad 'u)
+      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+      ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
+      (if (equal? lad 'd)
+          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+          ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
+          (if (equal? lad 'l)
+              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+              ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
+              (if (equal? lad 'r)
+                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+                  ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
+                  ;else
+                  (void)
+                  )
+              )
+      )
+      )
+  (copy-viewport CampoJugadores ventanaPrincipal)
+  ;((clear-viewport CampoJugadores))
+  )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Funcion para que el jugador se mueva desde el teclada
+;Ademas genera los limites para que el jugadores no se mueve mas alla de sus limite
+;limR => limite derecho del jugador
+;limI => limite izq del jugador
+;posx => posicion en x
+;posy => posicion en y
+;press => la tecla que se esta presionando
+(define (teclado limR limI posx posy press)
+  ;limite derecha
+  (if (< posx limR)
+      (begin
+        (jugadores limR posy 'r)
+        (teclado limR limI limR posy (key-value(get-key-press ventanaPrincipal))))
+      ;limite de la izquiera TODO un parametro
+  (if (> posx (- limI 10))
+      (begin
+        (jugadores (- limI 10) posy 'r)
+        (teclado limR limI (- limI 10) posy (key-value(get-key-press ventanaPrincipal))))
+      ;limite arriba
+  (if (< posy 0)
+      (begin
+        (jugadores posx 0 'u)
+        (teclado limR limI posx 0 (key-value(get-key-press ventanaPrincipal))))
+      ;limite de abajo
+  (if (> posy 490)
+      (begin
+        (jugadores posx  490 'd)
+        (teclado limR limI posx 490 (key-value(get-key-press ventanaPrincipal))))    
+  (if (equal? press 'up)
+      (begin
+        (jugadores posx posy 'u)
+        (teclado limR limI posx (- posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'down)
+          (begin
+            (jugadores posx posy 'd)
+            (teclado limR limI posx (+ posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'left)
+          (begin
+            (jugadores posx posy 'l)
+            (teclado limR limI (- posx 10) posy (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'right)
+          (begin
+            (jugadores posx posy 'r)
+            (teclado limR limI (+ posx 10) posy (key-value (get-key-press ventanaPrincipal))))
+          ;else
+          (teclado limR limI posx posy (key-value (get-key-press ventanaPrincipal)))
+          )
+    )
+      )
+      )
+  )
+  ))
+  ))
+
+  (teclado 200 350 250 250 'up)
+
