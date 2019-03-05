@@ -9,21 +9,21 @@
 ;ventana ocultas para definir los limites de jugadores
 (define CampoJugadores (open-pixmap  "PorteroG1"  1200 500))
 ;Limite del porteroG1
-((draw-solid-rectangle CampoJugadores) (make-posn 0 0) 50 500 "green")
+;((draw-solid-rectangle CampoJugadores) (make-posn 0 0) 50 500 "green")
 ;Limite del porteroG1
-((draw-solid-rectangle CampoJugadores) (make-posn 50 0) 150 500 "yellow")
+;((draw-solid-rectangle CampoJugadores) (make-posn 50 0) 150 500 "yellow")
 ;Limite del porteroG1
-((draw-solid-rectangle CampoJugadores) (make-posn 200 0) 150 500 "orange")
+;((draw-solid-rectangle CampoJugadores) (make-posn 200 0) 150 500 "orange")
 ;Limite del porteroG1
-((draw-solid-rectangle CampoJugadores) (make-posn 350 0) 150 500 "blue")
+;((draw-solid-rectangle CampoJugadores) (make-posn 350 0) 150 500 "blue")
 ;Limite del porteroG2
-((draw-solid-rectangle CampoJugadores) (make-posn 950 0) 50 500 "green")
+;((draw-solid-rectangle CampoJugadores) (make-posn 950 0) 50 500 "green")
 ;Limite del porteroG2
-((draw-solid-rectangle CampoJugadores) (make-posn 800 0) 150 500 "yellow")
+;((draw-solid-rectangle CampoJugadores) (make-posn 800 0) 150 500 "yellow")
 ;Limite del porteroG2
-((draw-solid-rectangle CampoJugadores) (make-posn 650 0) 150 500 "orange")
+;((draw-solid-rectangle CampoJugadores) (make-posn 650 0) 150 500 "orange")
 ;Limite del porteroG2
-((draw-solid-rectangle CampoJugadores) (make-posn 500 0) 150 500 "blue")
+;((draw-solid-rectangle CampoJugadores) (make-posn 500 0) 150 500 "blue")
 ;Rectangulo para colocar informacion 
 ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
 ;Portada
@@ -63,7 +63,7 @@
               )
       )
       )
-  (copy-viewport CampoJugadores ventanaPrincipal)
+ (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
   )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -120,6 +120,29 @@
   )
   ))
   ))
+(define porteroG1
+  '(0 50 10 250)
+  )
+(define defensaG1 
+  '(50 200 60 250)
+  )
+(define medioG1
+  '(200 350 250 250)
+  )
+(define delanteroG1
+  '(350 500 400 250))
 
-  (teclado 200 350 250 250 'up)
+(define delanteroG2
+  '(500 650 550 250))
 
+(define medioG2
+  '(650 800 700 250))
+
+(define defensaG2
+  '(800 950 900 250))
+
+(define porteroG2
+  '(950 1000 1040 250))
+
+(teclado 350 500 400 250 'up)
+  ;(teclado 0 50 10 250 'up)
