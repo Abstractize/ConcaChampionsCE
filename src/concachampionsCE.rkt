@@ -12,7 +12,6 @@
 (define (Game Team1 Team2 fball Generations)
     (cond
         ((zero? Generations)
-         2
             (print "Exit")
         )
         (else
@@ -155,7 +154,7 @@
                     (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
                 )
                 (else
-                    (Fitness (cdr team) (append newTeam (midFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append (midFitness (cons (car team) subteam) '() bola) newTeam) '() bola)
                 )
             )
         )
@@ -172,6 +171,7 @@
                 )
             )
         )
+       (else -1)
     )
 )
 
@@ -186,7 +186,7 @@
         ((< (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
             (defenseFitness (cdr defenses) (cons (car bestDefenses) bestDefenses) ball)
         )
-        ((> (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
+        ((>= (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
             (defenseFitness (append (cdr defenses) bestDefenses ) (list (car defenses)) ball)
         )
     )
@@ -203,7 +203,7 @@
         ((< (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
             (midFitness (cdr mids) (cons (car bestMids) bestMids) ball)
         )
-        ((> (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
+        ((>= (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
             (midFitness (append (cdr mids) bestMids ) (list (car mids)) ball)
         )
     )
@@ -220,7 +220,7 @@
         ((< (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
             (forwFitness (cdr forwards) (cons (car bestForwards) bestForwards) ball)
         )
-        ((> (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
+        ((>= (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
             (forwFitness (append (cdr forwards) bestForwards ) (list (car forwards)) ball)
         )
     )
