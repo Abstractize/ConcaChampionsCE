@@ -31,7 +31,7 @@
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
 (sleep 3)
-    (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball (/ height 2) (/ width 2)) Generations)
+    (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball 495 245) Generations)
 )
 ;;Función de juego
 (define (Game Team1 Team2 fball Generations)
@@ -40,8 +40,10 @@
   (display "\n")
   (display "Team1\n")
   (print Team1)
+  (display "\n")
   (display "Team2\n")
   (print Team2)
+  (display "\n")
     (cond
         ((zero? Generations)
             ((clear-viewport CampoJugadores))
@@ -58,7 +60,7 @@
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
             ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
-            (transformar Team1 Team2)
+            (transformar Team1 Team2 fball)
             (print "Exit")
         )
         (else
@@ -77,8 +79,8 @@
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
             ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
             ;;Grafica los 2 equipos y la bola
-            (sleep 5)
-            ((transformar Team1 Team2) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
+            (sleep 2)
+            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
             
         )
     )
@@ -473,7 +475,30 @@
  (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
   )
-
+;Bola
+(define (bolaG posx posy lad)
+(if (equal? lad 'u)
+      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+      ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+      (if (equal? lad 'd)
+          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+          ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+          (if (equal? lad 'l)
+              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+              ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+              (if (equal? lad 'r)
+                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+                  ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+                  ;else
+                  (void)
+                  )
+              )
+      )
+ )
+  
+ (copy-viewport CampoJugadores ventanaPrincipal)
+  ;((clear-viewport CampoJugadores))
+  )
   ;Jugadores G2
   (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
@@ -499,14 +524,17 @@
   ;((clear-viewport CampoJugadores))
   )
   ;transformar
-  (define (transformar AliG1 AliG2)
+  (define (transformar AliG1 AliG2 bola)
   (cond ((and (null? AliG1) (null? AliG2))
+         
          void)
         (else
       (begin
+        (display bola)
+        (bolaG (car bola) (car (cdr bola)) 'r)
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
         (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
-        (transformar (cdr AliG1) (cdr AliG2)))
+        (transformar (cdr AliG1) (cdr AliG2) bola))
       )
      )
   )
