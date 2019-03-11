@@ -2,6 +2,7 @@
 
 ;;Constantes de Interfaz
 (define height  500)
+(define numD)
 (define width 1000)
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
@@ -33,8 +34,10 @@
 (define (player speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
     (list speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
 )
+
+
 ;;Función recursiva que crea un lista con los 2 equipos.
-(define (First_Gen players team)
+(define (First_Gen players team num)
     (cond
         ;;Lista vacía
         ((null? team)
@@ -49,22 +52,43 @@
                 )
                 (else
                     (cond
+                    ;Grupo 1 
+                    (if (zero? team)
                         ;;Portero
                         ((equal? (lenght team) 4)
-                            (First_Gen (cons (player (rand) (rand) 0 0 0 (randPosY) (rand) 0) players) (minus1 team))
+                            (First_Gen (cons (player (rand) (rand) 0 0 20 250 (rand) 0) players) (minus1 team))
                         )
                         ;;Defensa
                         ((equal? (lenght team) 3)                        
-                            (First_Gen (cons (player (rand) (rand) 0 0 (/ width 3) (randPosY) (rand) 1) players) (minus1 team))
+                            (First_Gen (cons (player (rand) (rand) 0 0 290 (randPosY) (rand) 1) players) (minus1 team))
                         )
                         ;;Medio
                         ((equal? (lenght team) 2)
-                            (First_Gen (cons (player (rand) (rand) 0 0 (/ width 2) (randPosY) (rand) 2) players) (minus1 team))
+                            (First_Gen (cons (player (rand) (rand) 0 0 498 (randPosY) (rand) 2) players) (minus1 team))
                         )
                         ;;Delantero
                         ((equal? (lenght team) 1)
-                            (First_Gen (cons (player (rand) (rand) 0 0 (* 2 (/ width 3)) (randPosY) (rand) 3) players) (minus1 team))
+                            (First_Gen (cons (player (rand) (rand) 0 0 680 (randPosY) (rand) 3) players) (minus1 team))
                         )
+                    )(else ;Equipo 2
+                        (
+                            ;;Portero
+                        ((equal? (lenght team) 4)
+                            (First_Gen (cons (player (rand) (rand) 0 0 970 250 (rand) 0) players) (minus1 team))
+                        )
+                        ;;Defensa
+                        ((equal? (lenght team) 3)                        
+                            (First_Gen (cons (player (rand) (rand) 0 0 725 (randPosY) (rand) 1) players) (minus1 team))
+                        )
+                        ;;Medio
+                        ((equal? (lenght team) 2)
+                            (First_Gen (cons (player (rand) (rand) 0 0 450 (randPosY) (rand) 2) players) (minus1 team))
+                        )
+                        ;;Delantero
+                        ((equal? (lenght team) 1)
+                            (First_Gen (cons (player (rand) (rand) 0 0 250 (randPosY) (rand) 3) players) (minus1 team))
+                        ))) 
+                        
                     )
                 )
             )            
@@ -308,7 +332,7 @@
 )
 ;;Random de Posición
 (define (randPosY)
-    (random 0 height)
+    (random 0 (- height 20))
 )
 ;;Función de random de 1 a 10
 (define (rand)
