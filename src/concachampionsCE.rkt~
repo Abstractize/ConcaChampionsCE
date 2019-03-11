@@ -4,7 +4,7 @@
 (open-graphics)
 
 ;;Constantes de Interfaz
-(define height 500)
+(define height  500)
 (define width 1000)
 
 ;ventana principal de la cancha
@@ -22,25 +22,21 @@
 ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
 ;Marcador
 ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-;Delimitadoress
+;Delimitadores
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
-((draw-pixmap CampoJugadores) "bola.png" (make-posn 500 220))
+((draw-pixmap CampoJugadores) "bola.bmp" (make-posn 500 220))
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
     (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball (/ height 2) (/ width 2)) Generations)
 )
 ;;Función de juego
 (define (Game Team1 Team2 fball Generations)
-  (display "Generation:")
   (print Generations)
   (display "\n")
-  (display "Team1\n")
   (print Team1)
-  (display "Team2\n")
-  (print Team2)
-  
+  (display "\n")
     (cond
         ((zero? Generations)
             (transformar Team1 Team2)
@@ -366,7 +362,7 @@
 )
 ;;Random de Posición
 (define (randPosY)
-    (random 0 (- height 40))
+    (random 0 (- height 20))
 )
 ;;Función de random de 1 a 10
 (define (rand)
@@ -423,16 +419,16 @@
 (define (jugadoresG1 posx posy lad )
   (if (equal? lad 'u)
       ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+      ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
       (if (equal? lad 'd)
           ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-          ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+          ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
           (if (equal? lad 'l)
               ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-              ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+              ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
               (if (equal? lad 'r)
                   ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-                  ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+                  ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -448,16 +444,16 @@
   (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
       ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+      ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
       (if (equal? lad 'd)
           ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-          ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+          ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
           (if (equal? lad 'l)
               ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-              ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+              ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
               (if (equal? lad 'r)
                   ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-                  ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+                  ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -481,4 +477,4 @@
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 0)
+(CCCE2019 '(4 4 2) '(5 3 2) 1)
