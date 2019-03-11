@@ -1,6 +1,3 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname concachampionsCE) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 #lang racket
 
 ;;Constantes de Interfaz
@@ -19,7 +16,7 @@
         )
         (else
             ;;Grafica los 2 equipos y la bola
-            (Game (Fitness Team1 Team2 fball) (Fitness Team2 Team1 fball) (update fball Team1 Team2) (- Generations 1))
+            (print(Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))
         )
     )
 )
@@ -69,30 +66,167 @@
         )        
     )
 )
-;;Función de Aptitud
-(define (Fitness Team1 Team2 bola)
-;;Mueve los jugadores a una nueva posición y compara las estadísticas.
 
+;;Method that mutate players, giving them more favorable characteristics.
+;;+0 o +-1 a las caracteristicas basicas
+(define (mutate players newPlayers)
+    (cond
+        ((null? players)
+         (print newPlayers)
+            newPlayers
+        )
+        ((null? newPlayers)
+            (mutate (cdr players) (list (car players)) )
+        )
+        (else
+            (mutate 
+                (cdr players) 
+                (list newPlayers 
+                    (player 
+                        (+ (random 0 2) (getComposition (car players) 0)) 
+                        (+ (random 0 2) (getComposition (car players) 1)) 
+                        (getComposition (car players) 2) 
+                        (getComposition (car players) 3)
+                        (+ (random 0 (getComposition (car players) 0)) (getComposition (car players) 2))
+                        (+ (random 0 (getComposition (car players) 0)) (getComposition (car players) 3))
+                        (+ (random 0 2) (getComposition (car players) 6))
+                        (getComposition (car players) 7)
+                    )
+                )
+            )    
+        )
+    )
+)
+
+;;Method that calculates the fitness of a single player
+;;suma de todas las caracteristicas basicas, si la bola esta en la zona que les
+;;corresponde, se considera |Xjugador-Xbola| |Yjugador-Ybola|, de lo contrario
+;;solo |Yjugador-Ybola|
+;;min siystem span: solo considerar Y?
+(define(calcFitness player ball)
+    (- (+ (getComposition player 0) (getComposition player 1) (getComposition player 6)) (abs(- (getComposition player 5) (cadr ball))))
+)
+
+;;Función de Aptitud
 ;;•	Porteros:
 ;;-Goles tapados.
 ;;-Alineación con el eje Y de la bola.
+;;solo un portero, por lo tanto se clona y se muta
 
 ;;•	Defensas:
 ;;-Alineación con la trayectoria de los delanteros contrarios.
 ;;-Otra cosa que se le ocurra.
+;;se busca el mejor defensa, se clona y se muta
   
 ;;•	Medios:
 ;;-Cercanía a la bola.
 ;;- Alineación con la trayectoria de los delanteros contrarios.
+;;se busca el mejor medio, se clona y se muta
   
 ;;•	Delanteros:
 ;;-Cercanía a la bola
 ;;-Goles Anotados
-  
-(print "Soy una función de Fitness")
+;;se busca el mejor delantero, se clona y se muta.
+
 ;;Retorna el nuevo equipo.
 ;;
+(define (Fitness team newTeam subteam bola)
+    (cond
+        ((null? team)
+            (mutate newTeam '())
+        )
+        ((equal? (getComposition (car team) 7) 0)
+            
+            (Fitness (cdr team) (list(car team)) '() bola )
+        )
+        ((equal? (getComposition (car team) 7) 1)
+            (cond
+                ((equal? (getComposition (cadr team) 7) 1)
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                )
+                (else
+                    (Fitness (cdr team) (append newTeam (defenseFitness (cons (car team) subteam) '() bola)) '() bola)
+                )
+            )
+        )
+        ((equal? (getComposition (car team) 7) 2)
+            (cond
+                ((equal? (getComposition (cadr team) 7) 2)
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                )
+                (else
+                    (Fitness (cdr team) (append newTeam (midFitness (cons (car team) subteam) '() bola)) '() bola)
+                )
+            )
+        )
+        ((equal? (getComposition (car team) 7) 3)
+            (cond
+                ((null? (cdr team))
+                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola)
+                )
+                ((equal? (getComposition (cadr team) 7) 3)
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                )
+                (else
+                    (Fitness (cdr team) (append newTeam (forwFitness (append (car team) subteam) '() bola)) '() bola)
+                )
+            )
+        )
+    )
 )
+
+(define(defenseFitness defenses bestDefenses ball)
+    (cond
+        ((null? defenses)
+            bestDefenses
+        )
+        ((null? bestDefenses)
+            (defenseFitness (cdr defenses) (list (car defenses)) ball)
+        )
+        ((< (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
+            (defenseFitness (cdr defenses) (cons (car bestDefenses) bestDefenses) ball)
+        )
+        ((> (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
+            (defenseFitness (append (cdr defenses) bestDefenses ) (list (car defenses)) ball)
+        )
+    )
+)
+
+(define(midFitness mids bestMids ball)
+    (cond
+        ((null? mids)
+            bestMids
+        )
+        ((null? bestMids)
+            (midFitness (cdr mids) (list (car mids)) ball)
+        )
+        ((< (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
+            (midFitness (cdr mids) (cons (car bestMids) bestMids) ball)
+        )
+        ((> (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
+            (midFitness (append (cdr mids) bestMids ) (list (car mids)) ball)
+        )
+    )
+)
+
+(define(forwFitness forwards bestForwards ball)
+    (cond
+        ((null? forwards)
+        bestForwards
+        )
+        ((null? bestForwards)
+            (forwFitness (cdr forwards) (list (car forwards)) ball)
+        )
+        ((< (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
+            (forwFitness (cdr forwards) (cons (car bestForwards) bestForwards) ball)
+        )
+        ((> (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
+            (forwFitness (append (cdr forwards) bestForwards ) (list (car forwards)) ball)
+        )
+    )
+)
+
+
 ;;Función que crea la bola
 (define (ball pos_X pos_Y)
     (list pos_X pos_Y)
@@ -124,10 +258,10 @@
             (cond
                 (
                     (and
-                        (equal? (getComposition (car(Team)) 4) (car fball));Pos X
-                        (equal? (getComposition (car(Team)) 5) (cdar fball));Pos Y
+                        (equal? (getComposition (car Team) 4) (car fball));Pos X
+                        (equal? (getComposition (car Team) 5) (car (cdr fball)));Pos Y
                     )
-                    (getComposition (car(Team)) 1);Force
+                    (getComposition (car Team) 1);Force
                 )
                 (else
                     (Compare_force fball (cdr Team))
@@ -144,8 +278,12 @@
 ;pos = 4 para X final
 ;pos = 5 para Y final
 ;pos = 6 para Ability
+;pos = 7 para Role
 (define (getComposition player pos)
     (cond
+        ((null? player)
+            -1
+        )
         ((zero? pos)
             (car player)
         )
@@ -160,7 +298,7 @@
 )
 ;;Función de random de 1 a 10
 (define (rand)
-    (random 1 10)
+    (random 1 11)
 )
 ;;Resta 1 al primero
 (define (minus1 lista)
@@ -205,4 +343,4 @@
 )
 
 ;;Juego
-;;(CCCE2019 '(4 4 2) '(5 3 2) 20)
+(CCCE2019 '(4 4 2) '(5 3 2) 6)
