@@ -31,15 +31,15 @@
 ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
 ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
 ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
-((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
-((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
+((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel (2017101642)")
+((draw-string CampoJugadores) (make-posn 1030 90) "Maria (2017101642)")
 ;Marcador
 ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
 ;Delimitadores
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
-((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
-((draw-pixmap CampoJugadores) "bola.bmp" (make-posn 500 220))
+((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/cancha.bmp" (make-posn 0 0))
+((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/bola.bmp" (make-posn 500 220))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Creacion de jugadores
@@ -49,16 +49,16 @@
 (define (jugadoresG1 posx posy lad )
   (if (equal? lad 'u)
       ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
+      ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/defensa.bmp" (make-posn posx posy))
       (if (equal? lad 'd)
           ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-          ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
+          ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/defensa.bmp" (make-posn posx posy))
           (if (equal? lad 'l)
               ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-              ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
+              ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/defensa.bmp" (make-posn posx posy))
               (if (equal? lad 'r)
                   ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-                  ((draw-pixmap CampoJugadores) "defensa.bmp" (make-posn posx posy))
+                  ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/defensa.bmp" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -69,20 +69,20 @@
  (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
   )
-0
+
 (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
       ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
+      ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
       (if (equal? lad 'd)
           ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-          ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
+          ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
           (if (equal? lad 'l)
               ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-              ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
+              ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
               (if (equal? lad 'r)
                   ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-                  ((draw-pixmap CampoJugadores) "delantero.bmp" (make-posn posx posy))
+                  ((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/delantero.bmp" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -103,6 +103,7 @@
 ;press => la tecla que se esta presionando
 (define (teclado limR limI posx posy press generacion)
 
+        
   ;limite derecha
   (if (< posx limR)
       (begin
@@ -116,7 +117,7 @@
         (jugadoresG1 (- limI 10) (+ posy 200) 'r)
         (teclado limR limI (- limI 10) posy (key-value(get-key-press ventanaPrincipal)) (- generacion 1)))
       ;limite arriba
-  (if (< posy 0)
+  (if (< posy 0)((draw-pixmap CampoJugadores) "/Users/bertha/Documents/Dr.Racket/ConcaChampionsCE/ejerciciosUI/cancha.bmp" (make-posn 0 0))
       (begin
         (jugadoresG1 posx 0 'u)
         (jugadoresG1 (+ posx 200) 0 'u)
@@ -156,7 +157,7 @@
   )
   ))
   ))
-;;Qué hace?
+
 
 
 (define (transformar AliG1 AliG2)
@@ -246,7 +247,7 @@
 (define (CCCE2019 AlG1 AlG2 G)
   (cond ((zero? G)
         (void))
-        (else 
+        (else
          ((transformar (G1 AlG1) (G2 AlG2)) (CCCE2019 AlG1 AlG2 (- 1 G))))))
   
 
