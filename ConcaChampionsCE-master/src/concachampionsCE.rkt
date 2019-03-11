@@ -10,19 +10,13 @@
 )
 ;;Función de juego
 (define (Game Team1 Team2 fball Generations)
-  (print Generations)
-  (display "\n")
-  (print Team1)
-  (display "\n")
     (cond
         ((zero? Generations)
             (print "Exit")
         )
         (else
-
-         
             ;;Grafica los 2 equipos y la bola
-            (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1))
+            (print(Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))
         )
     )
 )
@@ -78,6 +72,7 @@
 (define (mutate players newPlayers)
     (cond
         ((null? players)
+         (print newPlayers)
             newPlayers
         )
         ((null? newPlayers)
@@ -86,17 +81,17 @@
         (else
             (mutate 
                 (cdr players) 
-                (append newPlayers 
-                    (list(player 
-                        (+ (random 0 3) (getComposition (car players) 0)) 
-                        (+ (random 0 3) (getComposition (car players) 1)) 
-                        (getComposition (car players) 4) 
-                        (getComposition (car players) 5)
-                        (+ (random 0 (+ 1 (getComposition (car players) 0))) (getComposition (car players) 4))
-                        (+ (random 0 (+ 1 (getComposition (car players) 0))) (getComposition (car players) 5))
-                        (+ (random 0 3) (getComposition (car players) 6))
+                (list newPlayers 
+                    (player 
+                        (+ (random 0 2) (getComposition (car players) 0)) 
+                        (+ (random 0 2) (getComposition (car players) 1)) 
+                        (getComposition (car players) 2) 
+                        (getComposition (car players) 3)
+                        (+ (random 0 (getComposition (car players) 0)) (getComposition (car players) 2))
+                        (+ (random 0 (getComposition (car players) 0)) (getComposition (car players) 3))
+                        (+ (random 0 2) (getComposition (car players) 6))
                         (getComposition (car players) 7)
-                    ))
+                    )
                 )
             )    
         )
@@ -109,7 +104,7 @@
 ;;solo |Yjugador-Ybola|
 ;;min siystem span: solo considerar Y?
 (define(calcFitness player ball)
-    (- (+ (getComposition player 0) (getComposition player 1) (getComposition player 6)) (abs(- (getComposition player 5) (car(cdr ball)))))
+    (- (+ (getComposition player 0) (getComposition player 1) (getComposition player 6)) (abs(- (getComposition player 5) (cadr ball))))
 )
 
 ;;Función de Aptitud
@@ -146,7 +141,7 @@
         )
         ((equal? (getComposition (car team) 7) 1)
             (cond
-                ((equal? (getComposition (car (cdr team)) 7) 1)
+                ((equal? (getComposition (cadr team) 7) 1)
                     (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
                 )
                 (else
@@ -156,7 +151,7 @@
         )
         ((equal? (getComposition (car team) 7) 2)
             (cond
-                ((equal? (getComposition (car (cdr team)) 7) 2)
+                ((equal? (getComposition (cadr team) 7) 2)
                     (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
                 )
                 (else
@@ -169,15 +164,14 @@
                 ((null? (cdr team))
                     (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola)
                 )
-                ((equal? (getComposition (car (cdr team)) 7) 3)
+                ((equal? (getComposition (cadr team) 7) 3)
                     (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
                 )
                 (else
-                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append newTeam (forwFitness (append (car team) subteam) '() bola)) '() bola)
                 )
             )
         )
-       (else -1)
     )
 )
 
@@ -189,17 +183,13 @@
         ((null? bestDefenses)
             (defenseFitness (cdr defenses) (list (car defenses)) ball)
         )
-        ((<= (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
+        ((< (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
             (defenseFitness (cdr defenses) (cons (car bestDefenses) bestDefenses) ball)
         )
         ((> (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
             (defenseFitness (append (cdr defenses) bestDefenses ) (list (car defenses)) ball)
         )
     )
-)
-
-(define (fusePlayers oldPlayer newPlayer)
-  (print "Soy una funcion que conserva posiciones iniciales y finales")
 )
 
 (define(midFitness mids bestMids ball)
@@ -210,7 +200,7 @@
         ((null? bestMids)
             (midFitness (cdr mids) (list (car mids)) ball)
         )
-        ((<= (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
+        ((< (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
             (midFitness (cdr mids) (cons (car bestMids) bestMids) ball)
         )
         ((> (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
@@ -227,7 +217,7 @@
         ((null? bestForwards)
             (forwFitness (cdr forwards) (list (car forwards)) ball)
         )
-        ((<= (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
+        ((< (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
             (forwFitness (cdr forwards) (cons (car bestForwards) bestForwards) ball)
         )
         ((> (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
@@ -250,15 +240,11 @@
         )     
         ;;Comprueba si el equipo 1 le pegó.
         ((> (Compare_force fball Team1) 0)
-            (ball (+ (car fball) (Compare_force fball Team1)) (car (cdr fball)))
-        )
-        ((> (Compare_force fball Team2) 0)
-            (ball (+ (car fball) (Compare_force fball Team2)) (car (cdr fball)))
+            (ball (+ (car fball) (Compare_force fball Team1)) (cdar fball))
         )
         ;;Comprueba si el equipo 2 le pegó.
         (else
-            (print "Caso no admitido")
-            fball
+            (ball (- (car fball) (Compare_force fball Team1)) (cdar fball))
         ) 
     )
 )
@@ -296,7 +282,6 @@
 (define (getComposition player pos)
     (cond
         ((null? player)
-         (print "Error")
             -1
         )
         ((zero? pos)
@@ -358,4 +343,4 @@
 )
 
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 5)
+(CCCE2019 '(4 4 2) '(5 3 2) 6)
