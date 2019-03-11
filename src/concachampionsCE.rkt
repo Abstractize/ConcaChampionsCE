@@ -2,11 +2,10 @@
 
 ;;Constantes de Interfaz
 (define height  500)
-(define numD)
 (define width 1000)
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
-    (Game (First_Gen '() (cons 1 Team1)) (First_Gen '() (cons 1 Team2)) (ball (/ height 2) (/ width 2)) Generations)
+    (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball (/ height 2) (/ width 2)) Generations)
 )
 ;;Función de juego
 (define (Game Team1 Team2 fball Generations)
@@ -51,50 +50,55 @@
                     (First_Gen players (cdr team))
                 )
                 (else
-                    (cond
-                    ;Grupo 1 
+                    ;Equipo 1
                     (if (zero? team)
-                        ;;Portero
-                        ((equal? (lenght team) 4)
-                            (First_Gen (cons (player (rand) (rand) 0 0 20 250 (rand) 0) players) (minus1 team))
-                        )
-                        ;;Defensa
-                        ((equal? (lenght team) 3)                        
-                            (First_Gen (cons (player (rand) (rand) 0 0 290 (randPosY) (rand) 1) players) (minus1 team))
-                        )
-                        ;;Medio
-                        ((equal? (lenght team) 2)
-                            (First_Gen (cons (player (rand) (rand) 0 0 498 (randPosY) (rand) 2) players) (minus1 team))
-                        )
-                        ;;Delantero
-                        ((equal? (lenght team) 1)
-                            (First_Gen (cons (player (rand) (rand) 0 0 680 (randPosY) (rand) 3) players) (minus1 team))
-                        )
-                    )(else ;Equipo 2
-                        (
+                        (cond
                             ;;Portero
-                        ((equal? (lenght team) 4)
-                            (First_Gen (cons (player (rand) (rand) 0 0 970 250 (rand) 0) players) (minus1 team))
+                            ((equal? (lenght team) 4)
+                                (First_Gen (cons (player (rand) (rand) 0 0 20 250 (rand) 0) players) (minus1 team))
+                            )
+                            ;;Defensa
+                            ((equal? (lenght team) 3)                        
+                                (First_Gen (cons (player (rand) (rand) 0 0 290 (randPosY) (rand) 1) players) (minus1 team))
+                            )
+                            ;;Medio
+                            ((equal? (lenght team) 2)
+                                (First_Gen (cons (player (rand) (rand) 0 0 498 (randPosY) (rand) 2) players) (minus1 team))
+                            )
+                            ;;Delantero
+                            ((equal? (lenght team) 1)
+                                (First_Gen (cons (player (rand) (rand) 0 0 680 (randPosY) (rand) 3) players) (minus1 team))
+                            )
                         )
-                        ;;Defensa
-                        ((equal? (lenght team) 3)                        
-                            (First_Gen (cons (player (rand) (rand) 0 0 725 (randPosY) (rand) 1) players) (minus1 team))
-                        )
-                        ;;Medio
-                        ((equal? (lenght team) 2)
-                            (First_Gen (cons (player (rand) (rand) 0 0 450 (randPosY) (rand) 2) players) (minus1 team))
-                        )
-                        ;;Delantero
-                        ((equal? (lenght team) 1)
-                            (First_Gen (cons (player (rand) (rand) 0 0 250 (randPosY) (rand) 3) players) (minus1 team))
-                        ))) 
-                        
                     )
+                    ;Equipo 2
+                    (else
+                        (cond
+                            ;;Portero
+                            ((equal? (lenght team) 4)
+                                (First_Gen (cons (player (rand) (rand) 0 0 970 250 (rand) 0) players) (minus1 team))
+                            )
+                            ;;Defensa
+                            ((equal? (lenght team) 3)                        
+                                (First_Gen (cons (player (rand) (rand) 0 0 725 (randPosY) (rand) 1) players) (minus1 team))
+                            )
+                            ;;Medio
+                            ((equal? (lenght team) 2)
+                                (First_Gen (cons (player (rand) (rand) 0 0 450 (randPosY) (rand) 2) players) (minus1 team))
+                            )
+                            ;;Delantero
+                            ((equal? (lenght team) 1)
+                                (First_Gen (cons (player (rand) (rand) 0 0 250 (randPosY) (rand) 3) players) (minus1 team))
+                            )
+                        )
+                    ) 
+                        
                 )
-            )            
-        )        
-    )
+            )
+        )            
+    )        
 )
+
 
 ;;Method that mutate players, giving them more favorable characteristics.
 ;;+0 o +-1 a las caracteristicas basicas
