@@ -1,6 +1,7 @@
 #lang racket
 (require (lib "graphics.ss" "graphics"))
-(require htdp/draw)
+(require 2htdp/universe)
+;;(require htdp/draw)
 (open-graphics)
 
 ;;Constantes de Interfaz
@@ -29,6 +30,7 @@
 ((draw-pixmap CampoJugadores) "bola.png" (make-posn 500 220))
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
+(sleep 3)
     (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball (/ height 2) (/ width 2)) Generations)
 )
 ;;Función de juego
@@ -40,15 +42,43 @@
   (print Team1)
   (display "Team2\n")
   (print Team2)
-  
     (cond
         ((zero? Generations)
+            ((clear-viewport CampoJugadores))
+            ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
+            ;Portada
+            ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
+            ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
+            ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
+            ((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
+            ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
+            ;Marcador
+            ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
+            ;Delimitadoress
+            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
+            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
+            ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
             (transformar Team1 Team2)
             (print "Exit")
         )
         (else
+            ((clear-viewport CampoJugadores))
+            ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
+            ;Portada
+            ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
+            ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
+            ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
+            ((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
+            ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
+            ;Marcador
+            ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
+            ;Delimitadoress
+            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
+            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
+            ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
             ;;Grafica los 2 equipos y la bola
-            ((transformar Team1 Team2) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))
+            (sleep 5)
+            ((transformar Team1 Team2) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
             
         )
     )
@@ -481,4 +511,4 @@
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 0)
+(CCCE2019 '(4 4 2) '(5 3 2) 5)
