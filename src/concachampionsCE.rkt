@@ -1,8 +1,8 @@
 #lang racket
 
 ;;Constantes de Interfaz
-(define height 600)
-(define width 600)
+(define height  500)
+(define width 1000)
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
     (Game (First_Gen '() (cons 1 Team1)) (First_Gen '() (cons 1 Team2)) (ball (/ height 2) (/ width 2)) Generations)

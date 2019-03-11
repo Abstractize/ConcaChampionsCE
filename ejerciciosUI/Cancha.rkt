@@ -69,7 +69,7 @@
  (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
   )
-0
+
 (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
       ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
