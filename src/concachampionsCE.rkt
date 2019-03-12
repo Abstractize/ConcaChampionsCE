@@ -78,10 +78,11 @@
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
             ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
+            
             ;;Grafica los 2 equipos y la bola
             (sleep 2)
             ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
-            
+            (bolaG (car fball) (car (cdr fball)) 5) 
         )
     )
 )
@@ -454,16 +455,12 @@
 ;lad => tecla que mueve el jugador, Preguntar al profe(aqui creo que va el algoritmo genetico)
 (define (jugadoresG1 posx posy lad )
   (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
       ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -476,18 +473,68 @@
   ;((clear-viewport CampoJugadores))
   )
 ;Bola
+(define (teclado posx posy press)
+
+;limite derecha
+ (if (> posx 980)
+    (begin
+       (bolaG 980 posy 'd)
+      (teclado 980 posy (key-value(get-key-press ventanaPrincipal))))
+ ;limite de la izquiera TODO un parametro
+  (if (< posx 10)
+      (begin
+        (bolaG 20 posy 'r)
+        (teclado 20 posy (key-value(get-key-press ventanaPrincipal)) ))
+      ;limite arriba
+  (if (< posy 0)
+      (begin
+        (bolaG posx 0 'u)
+        (teclado posx 0 (key-value(get-key-press ventanaPrincipal))))
+      ;limite de abajo
+  (if (> posy 490)
+      (begin
+        (bolaG posx  490 'd)
+        (teclado posx 490 (key-value(get-key-press ventanaPrincipal))))    
+  (if (equal? press 'up)
+      (begin
+        (bolaG posx posy 'u)
+        (teclado posx (- posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'down)
+          (begin
+            (bolaG posx posy 'd)
+            (teclado  posx (+ posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'left)
+          (begin
+            (bolaG posx posy 'l)
+            (teclado (- posx 10) posy (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'right)
+          (begin
+            (bolaG posx posy 'r)
+            (teclado  (+ posx 10) posy (key-value (get-key-press ventanaPrincipal)) ))
+          ;else
+          (teclado  posx posy (key-value (get-key-press ventanaPrincipal)))
+          )
+    )
+      )
+      )
+  )
+  ))
+  )
+  )
+  
 (define (bolaG posx posy lad)
+;  (cond((zero? lad)
+;        ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+;        )
+;       (else(define (teclado limR limI posx posy press generacion)
+;          (bolaG (- posx 10) posy (- lad 1))))
 (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -502,16 +549,12 @@
   ;Jugadores G2
   (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
       ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -531,7 +574,8 @@
         (else
       (begin
         (display bola)
-        (bolaG (car bola) (car (cdr bola)) 'r)
+        ;(bolaG (car bola) (car (cdr bola)) 5)
+        (teclado (car bola) (car(cdr bola)) 'up)
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
         (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
         (transformar (cdr AliG1) (cdr AliG2) bola))
