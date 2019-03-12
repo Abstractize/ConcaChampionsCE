@@ -164,13 +164,13 @@
 
 ;;Method that mutate players, giving them more favorable characteristics.
 ;;+0 o +-1 a las caracteristicas basicas
-(define (mutate players newPlayers)
+(define (mutate players newPlayers ball)
     (cond
         ((null? players)
             newPlayers
         )
         ((null? newPlayers)
-            (mutate (cdr players) (list (car players)) )
+            (mutate (cdr players) (list (car players)) ball)
         )
         (else
             (mutate 
@@ -179,14 +179,15 @@
                     (list(player 
                         (mutateSpeed (car players) (random -2 3)) 
                         (mutateStrength (car players) (random -2 3)) 
-                        (getComposition (car players) 4) 
-                        (getComposition (car players) 5)
-                        (+ (random 0 (+ 1 (getSpeed (car players)))) (getXf (car players)))
-                        (+ (random 0 (+ 1 (getSpeed (car players)))) (getYf (car players)))
+                        (getXf (car players)) 
+                        (getYf (car players)) 
+                        (newXf (car players) ball (getSpeed (car players)) (getXf (car players)))
+                        (newYf (car players) ball (getSpeed (car players)) (getYf (car players)))
                         (mutateAbility (car players) (random -2 3))
                         (getComposition (car players) 7)
                     ))
                 )
+                ball
             )    
         )
     )
@@ -232,8 +233,38 @@
 )
 
 ;;Method that decides the new X position of the player
-(define (newXf member)
-    (+ (random 0 (+ 1 (getComposition member 0))) (getComposition member 4))
+(define (newXf member ball iterations result)
+    (cond
+        ((zero? iterations)
+            result
+        )
+        ((< (car ball) (getXf member))
+            (newXf member ball (- iterations 1) (- result 2))
+        )
+        ((> (car ball) (getXf member))
+            (newXf member ball (- iterations 1) (+ result 2))
+        )
+        ((equal? (car ball) (getXf member))
+            result
+        )
+    )
+)
+
+(define (newYf member ball iterations result)
+    (cond
+        ((zero? iterations)
+            result
+        )
+        ((< (car (cdr ball)) (getYf member))
+            (newYf member ball (- iterations 1) (- result 2))
+        )
+        ((> (car (cdr ball)) (getYf member))
+            (newYf member ball (- iterations 1) (+ result 2))
+        )
+        ((equal? (car (cdr ball)) (getYf member))
+            result
+        )
+    )
 )
 
 ;;Method that calculates the fitness of a single player
@@ -271,7 +302,7 @@
 (define (Fitness team newTeam subteam bola nTeam)
     (cond
         ((null? team)
-            (mutate newTeam '())
+            (mutate newTeam '() bola)
         )
         ((isGoalie (car team))
             (Fitness (cdr team) (list(car team)) '() bola nTeam)
