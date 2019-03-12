@@ -13,7 +13,7 @@
 
 ;ventana ocultas para definir los limites de jugadores
 (define CampoJugadores (open-pixmap  "PorteroG1"  1200 500))
-
+(define (interfazCancha)
 ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
 ;Portada
 ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
@@ -27,7 +27,14 @@
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
+(void)
+)
+
+(interfazCancha)
 ((draw-pixmap CampoJugadores) "bola.png" (make-posn 500 220))
+
+
+
 ;;main (CCCE2019 ‘(4 4 2) ‘(5 3 2) 20)
 (define (CCCE2019 Team1 Team2 Generations)
 (sleep 3)
@@ -46,42 +53,16 @@
   ;;(display "\n")
     (cond
         ((zero? Generations)
-            ((clear-viewport CampoJugadores))
-            ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
-            ;Portada
-            ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
-            ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
-            ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
-            ((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
-            ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
-            ;Marcador
-            ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-            ;Delimitadoress
-            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
-            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
-            ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
+            (interfazCancha)
             (transformar Team1 Team2 fball)
             (print "Exit")
         )
         (else
-            ((clear-viewport CampoJugadores))
-            ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
-            ;Portada
-            ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
-            ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
-            ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
-            ((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
-            ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
-            ;Marcador
-            ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-            ;Delimitadoress
-            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
-            ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
-            ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
+            (interfazCancha)
             ;;Grafica los 2 equipos y la bola
-            ;;(sleep 2)
-            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))            
-            
+            (sleep 2)
+            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
+            (bolaG (car fball) (car (cdr fball)) 5) 
         )
     )
 )
@@ -93,15 +74,27 @@
 (define (player speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
     (list speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
 )
+;;Retorna 0 si no hubo gol, 1 si el equipo 1 metió gol y 2 si el equipo 2 metió gol
+(define (goal fball)
+    (cond
+        ((and (and (< 480 (car (cdr fball))) (> 20 fball)) (<= (car fball) 0))
+            2
+        ) 
+        ((and (and (< 480 (car (cdr fball))) (> 20 fball)) (>= (car fball) 1000))
+            1
+        )
+        (else
+            0
+        ) 
+    )    
+)
 
-
-;;Función recursiva que crea un lista con los 2 equipos.
+;;Función recursiva que crea un lista con un equipo.
 (define (First_Gen players team num)
     (cond
-        ;;Lista vacía
+        ;;Equipo vacío
         ((null? team)
             (reverse players)
-            ;;Función para separar los jugadores(players team)
         )
         (else
             (cond
@@ -110,57 +103,70 @@
                     (First_Gen players (cdr team) num)
                 )
                 (else
-                    
-                        (cond
-                            ;;Team 1 
-                            ((zero? num)
-                                (cond
-                                    ;;Portero
-                                    ((equal? (lenght team) 4)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 20 250 (rand) 0) players) (minus1 team) num)
-                                    )
-                                    ;;Defensa
-                                    ((equal? (lenght team) 3)                        
-                                        (First_Gen (cons (player (rand) (rand) 0 0 290 (randPosY) (rand) 1) players) (minus1 team) num)
-                                    )
-                                    ;;Medio
-                                    ((equal? (lenght team) 2)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 498 (randPosY) (rand) 2) players) (minus1 team) num)
-                                    )
-                                    ;;Delantero
-                                    ((equal? (lenght team) 1)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 680 (randPosY) (rand) 3) players) (minus1 team) num)
-                                    )   
-                                )
-                            )
-                            (else
-                                (cond
-                                    ;;Portero
-                                    ((equal? (lenght team) 4)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 970 250 (rand) 0) players) (minus1 team) num)
-                                    )
-                                    ;;Defensa
-                                    ((equal? (lenght team) 3)                        
-                                        (First_Gen (cons (player (rand) (rand) 0 0 725 (randPosY) (rand) 1) players) (minus1 team) num)
-                                    )
-                                    ;;Medio
-                                    ((equal? (lenght team) 2)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 450 (randPosY) (rand) 2) players) (minus1 team) num)
-                                    )
-                                    ;;Delantero
-                                    ((equal? (lenght team) 1)
-                                        (First_Gen (cons (player (rand) (rand) 0 0 250 (randPosY) (rand) 3) players) (minus1 team) num)
-                                    )
-                                )
-                            )
-                        )
-                                            
+                    (First_Gen (cons (characterCreator (lenght team) num) players) (minus1 team) num)                
                 )
             )
         )            
     )        
 )
-
+;;Funciones que asignan el siguiente jugador
+(define (characterCreator teamLenght team)
+    (cond 
+        ((equal? teamLenght 4)
+            (goalkeeper team)
+        )
+        ((equal? teamLenght 3)
+            (defense team)
+        )
+        ((equal? teamLenght 2)
+            (midfields team)
+        )
+        ((equal? teamLenght 1)
+            (forwards team)
+        )
+    )
+)
+;;Funciones que crean los jugadores de acuerdo al equipo
+(define (goalkeeper team)
+    (cond 
+        ((zero? team)
+            (player (rand) (rand) 0 0 20 250 (rand) 0)
+        )
+        (else
+            (player (rand) (rand) 0 0 970 250 (rand) 0)
+        )
+    )
+)
+(define (defense team)
+    (cond 
+        ((zero? team)
+            (player (rand) (rand) 0 0 290 (randPosY) (rand) 1)
+        )
+        (else
+            (player (rand) (rand) 0 0 725 (randPosY) (rand) 1)
+        )
+    )
+)
+(define (midfields team)
+    (cond 
+        ((zero? team)
+            (player (rand) (rand) 0 0 498 (randPosY) (rand) 2)
+        )
+        (else
+            (player (rand) (rand) 0 0 450 (randPosY) (rand) 2)
+        )
+    )
+)
+(define (forwards team)
+    (cond 
+        ((zero? team)
+            (player (rand) (rand) 0 0 680 (randPosY) (rand) 3)
+        )
+        (else
+            (player (rand) (rand) 0 0 250 (randPosY) (rand) 3)
+        )
+    )
+)
 
 ;;Method that mutate players, giving them more favorable characteristics.
 ;;+0 o +-1 a las caracteristicas basicas
@@ -611,16 +617,12 @@
 ;lad => tecla que mueve el jugador, Preguntar al profe(aqui creo que va el algoritmo genetico)
 (define (jugadoresG1 posx posy lad )
   (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
       ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -633,18 +635,68 @@
   ;((clear-viewport CampoJugadores))
   )
 ;Bola
+(define (teclado posx posy press)
+
+;limite derecha
+ (if (> posx 980)
+    (begin
+       (bolaG 980 posy 'd)
+      (teclado 980 posy (key-value(get-key-press ventanaPrincipal))))
+ ;limite de la izquiera TODO un parametro
+  (if (< posx 10)
+      (begin
+        (bolaG 20 posy 'r)
+        (teclado 20 posy (key-value(get-key-press ventanaPrincipal)) ))
+      ;limite arriba
+  (if (< posy 0)
+      (begin
+        (bolaG posx 0 'u)
+        (teclado posx 0 (key-value(get-key-press ventanaPrincipal))))
+      ;limite de abajo
+  (if (> posy 490)
+      (begin
+        (bolaG posx  490 'd)
+        (teclado posx 490 (key-value(get-key-press ventanaPrincipal))))    
+  (if (equal? press 'up)
+      (begin
+        (bolaG posx posy 'u)
+        (teclado posx (- posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'down)
+          (begin
+            (bolaG posx posy 'd)
+            (teclado  posx (+ posy 10) (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'left)
+          (begin
+            (bolaG posx posy 'l)
+            (teclado (- posx 10) posy (key-value (get-key-press ventanaPrincipal))))
+      (if (equal? press 'right)
+          (begin
+            (bolaG posx posy 'r)
+            (teclado  (+ posx 10) posy (key-value (get-key-press ventanaPrincipal)) ))
+          ;else
+          (teclado  posx posy (key-value (get-key-press ventanaPrincipal)))
+          )
+    )
+      )
+      )
+  )
+  ))
+  )
+  )
+  
 (define (bolaG posx posy lad)
+;  (cond((zero? lad)
+;        ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+;        )
+;       (else(define (teclado limR limI posx posy press generacion)
+;          (bolaG (- posx 10) posy (- lad 1))))
 (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-      ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -659,16 +711,12 @@
   ;Jugadores G2
   (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
       ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -687,8 +735,9 @@
          void)
         (else
       (begin
-        ;;(display bola)
-        (bolaG (car bola) (car (cdr bola)) 'r);Saca el X y Y
+        (display bola)
+        (bolaG (car bola) (car (cdr bola)) 5)
+        ;(teclado (car bola) (car(cdr bola)) 'up)
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
         (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
         (transformar (cdr AliG1) (cdr AliG2) bola))
