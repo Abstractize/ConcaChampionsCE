@@ -790,18 +790,17 @@
   )
   
 (define (bolaG posx posy lad)
-;  (cond((zero? lad)
-;        ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
-;        )
-;       (else(define (teclado limR limI posx posy press generacion)
-;          (bolaG (- posx 10) posy (- lad 1))))
 (if (equal? lad 'u)
-((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+      ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
       (if (equal? lad 'd)
+          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
           ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
           (if (equal? lad 'l)
+              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
               ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
               (if (equal? lad 'r)
+                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
                   ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
                   ;else
                   (void)
@@ -812,7 +811,7 @@
   
  (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
-  )
+)
   ;Jugadores G2
   (define (jugadoresG2 posx posy lad )
   (if (equal? lad 'u)
