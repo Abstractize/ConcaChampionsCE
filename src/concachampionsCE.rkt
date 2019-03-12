@@ -8,6 +8,9 @@
 (define height 500)
 (define width 1000)
 
+(define ScoreTeam1 0)
+(define ScoreTeam2 0)
+
 ;ventana principal de la cancha
 (define ventanaPrincipal (open-viewport "Cancha" 1200 500))
 
@@ -29,9 +32,9 @@
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
 (void)
 )
-
-(interfazCancha)
 ((draw-pixmap CampoJugadores) "bola.png" (make-posn 500 220))
+(interfazCancha)
+
 
 
 
@@ -58,11 +61,23 @@
             (print "Exit")
         )
         (else
-            (interfazCancha)
-            ;;Grafica los 2 equipos y la bola
-            (sleep 2)
-            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))            
-            (bolaG (car fball) (car (cdr fball)) 5) 
+            (cond
+                ((goal fball)
+                 ;;Cambiar el Fitness para las posiciones.
+                 ;;Revisar movimiento del Update
+                    ((interfazCancha)
+                    ;;Grafica los 2 equipos y la bola
+                    ;(sleep 2)
+                    ((transformar Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
+                    )       
+                )
+                (else
+                    (interfazCancha)
+                    ;;Grafica los 2 equipos y la bola
+                    ;(sleep 2)
+                    ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))
+                )   
+            )            
         )
     )
 )
@@ -77,14 +92,16 @@
 ;;Retorna 0 si no hubo gol, 1 si el equipo 1 metió gol y 2 si el equipo 2 metió gol
 (define (goal fball)
     (cond
-        ((and (and (< 480 (car (cdr fball))) (> 20 fball)) (<= (car fball) 0))
-            2
+        ((<= (car fball) 0)
+            (+ ScoreTeam2 1)
+            #t
         ) 
-        ((and (and (< 480 (car (cdr fball))) (> 20 fball)) (>= (car fball) 1000))
-            1
+        ((>= (car fball) 990)
+            (+ ScoreTeam1 1)
+            #t
         )
         (else
-            0
+            #f
         ) 
     )    
 )
@@ -519,10 +536,10 @@
         )     
         ;;Comprueba si el equipo 1 le pegó.
         ((> (Compare_force fball Team1) 0)
-            (ball (- (car fball) (Compare_force fball Team1)) (car (cdr fball)))
+            (ball (+ (car fball) (Compare_force fball Team1)) (car (cdr fball)))
         )
         ((> (Compare_force fball Team2) 0)
-            (ball (+ (car fball) (Compare_force fball Team2)) (car (cdr fball)))
+            (ball (- (car fball) (Compare_force fball Team2)) (car (cdr fball)))
         )
         ;;Comprueba si el equipo 2 le pegó.
         (else
@@ -789,26 +806,9 @@
   )
   )
   
-(define (bolaG posx posy lad)
-(if (equal? lad 'u)
-      ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
+(define (bolaG posx posy)
       ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
-      (if (equal? lad 'd)
-          ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-          ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
-          (if (equal? lad 'l)
-              ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-              ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
-              (if (equal? lad 'r)
-                  ;((draw-solid-rectangle CampoJugadores) (make-posn posx posy) 10 10 "black")
-                  ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
-                  ;else
-                  (void)
-                  )
-              )
-      )
- )
-  
+     
  (copy-viewport CampoJugadores ventanaPrincipal)
   ;((clear-viewport CampoJugadores))
 )
@@ -835,18 +835,18 @@
   ;transformar
   (define (transformar AliG1 AliG2 bola)
   (cond ((and (null? AliG1) (null? AliG2))
-         
+         (bolaG (car bola) (car (cdr bola)))
          void)
         (else
-      (begin
-        ;;(display bola)
-        (bolaG (car bola) (car (cdr bola)) 5)
+      (begin      
         ;(teclado (car bola) (car(cdr bola)) 'up)
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
         (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
+        
         (transformar (cdr AliG1) (cdr AliG2) bola))
+        
       )
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 100)
+(CCCE2019 '(4 4 2) '(5 3 2) 50)
