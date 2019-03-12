@@ -35,15 +35,15 @@
 )
 ;;Función de juego
 (define (Game Team1 Team2 fball Generations)
-  (display "Generation:")
-  (print Generations)
-  (display "\n")
-  (display "Team1\n")
-  (print Team1)
-  (display "\n")
-  (display "Team2\n")
-  (print Team2)
-  (display "\n")
+  ;;(display "Generation:")
+  ;;(print Generations)
+  ;;(display "\n")
+  ;;(display "Team1\n")
+  ;;(print Team1)
+  ;;(display "\n")
+  ;;(display "Team2\n")
+  ;;(print Team2)
+  ;;(display "\n")
     (cond
         ((zero? Generations)
             ((clear-viewport CampoJugadores))
@@ -79,8 +79,8 @@
             ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
             ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
             ;;Grafica los 2 equipos y la bola
-            (sleep 2)
-            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
+            ;;(sleep 2)
+            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))            
             
         )
     )
@@ -177,19 +177,63 @@
                 (cdr players) 
                 (append newPlayers 
                     (list(player 
-                        (+ (random 0 3) (getComposition (car players) 0)) 
-                        (+ (random 0 3) (getComposition (car players) 1)) 
+                        (mutateSpeed (car players) (random -2 3)) 
+                        (mutateStrength (car players) (random -2 3)) 
                         (getComposition (car players) 4) 
                         (getComposition (car players) 5)
-                        (+ (random 0 (+ 1 (getComposition (car players) 0))) (getComposition (car players) 4))
-                        (+ (random 0 (+ 1 (getComposition (car players) 0))) (getComposition (car players) 5))
-                        (+ (random 0 3) (getComposition (car players) 6))
+                        (+ (random 0 (+ 1 (getSpeed (car players)))) (getXf (car players)))
+                        (+ (random 0 (+ 1 (getSpeed (car players)))) (getYf (car players)))
+                        (mutateAbility (car players) (random -2 3))
                         (getComposition (car players) 7)
                     ))
                 )
             )    
         )
     )
+)
+
+;;Method that mutates the speed of a player
+(define (mutateSpeed member value)
+    (cond
+        ((<= (+ value (getSpeed member)) 1)
+            1
+        )
+        ((>= (+ value (getSpeed member)) 10)
+            10
+        )
+        (else (+ value (getSpeed member)))
+    )
+)
+
+;;Method that mutates the strength of a player
+(define (mutateStrength member value)
+    (cond
+        ((<= (+ value (getStrength member)) 1)
+            1
+        )
+        ((>= (+ value (getStrength member)) 10)
+            10
+        )
+        (else (+ value (getStrength member)))
+    )
+)
+
+;;method that mutates the ability of a player
+(define (mutateAbility member value)
+    (cond
+        ((<= (+ value (getAbility member)) 1)
+            1
+        )
+        ((>= (+ value (getAbility member)) 10)
+            10
+        )
+        (else (+ value (getAbility member)))
+    )
+)
+
+;;Method that decides the new X position of the player
+(define (newXf member)
+    (+ (random 0 (+ 1 (getComposition member 0))) (getComposition member 4))
 )
 
 ;;Method that calculates the fitness of a single player
@@ -224,45 +268,44 @@
 
 ;;Retorna el nuevo equipo.
 ;;
-(define (Fitness team newTeam subteam bola)
+(define (Fitness team newTeam subteam bola nTeam)
     (cond
         ((null? team)
             (mutate newTeam '())
         )
-        ((equal? (getComposition (car team) 7) 0)
-            
-            (Fitness (cdr team) (list(car team)) '() bola )
+        ((isGoalie (car team))
+            (Fitness (cdr team) (list(car team)) '() bola nTeam)
         )
-        ((equal? (getComposition (car team) 7) 1)
+        ((isDefense (car team))
             (cond
-                ((equal? (getComposition (car (cdr team)) 7) 1)
-                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                ((isDefense (car (cdr team)))
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola nTeam)
                 )
                 (else
-                    (Fitness (cdr team) (append newTeam (defenseFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append newTeam (defenseFitness (cons (car team) subteam) '() bola)) '() bola nTeam)
                 )
             )
         )
-        ((equal? (getComposition (car team) 7) 2)
+        ((isMid (car team))
             (cond
-                ((equal? (getComposition (car (cdr team)) 7) 2)
-                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                ((isMid (car (cdr team)))
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola nTeam)
                 )
                 (else
-                    (Fitness (cdr team) (append newTeam (midFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append newTeam (midFitness (cons (car team) subteam) '() bola)) '() bola nTeam)
                 )
             )
         )
-        ((equal? (getComposition (car team) 7) 3)
+        ((isForward (car team))
             (cond
                 ((null? (cdr team))
-                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola nTeam)
                 )
-                ((equal? (getComposition (car (cdr team)) 7) 3)
-                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola )
+                ((isForward (car (cdr team)))
+                    (Fitness (cdr team) newTeam (cons (car team) subteam) bola nTeam )
                 )
                 (else
-                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola)
+                    (Fitness (cdr team) (append newTeam (forwFitness (cons (car team) subteam) '() bola)) '() bola nTeam)
                 )
             )
         )
@@ -279,16 +322,12 @@
             (defenseFitness (cdr defenses) (list (car defenses)) ball)
         )
         ((<= (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
-            (defenseFitness (cdr defenses) (cons (car bestDefenses) bestDefenses) ball)
+            (defenseFitness (cdr defenses) (append bestDefenses (list (fusePlayers (car defenses) (car bestDefenses)))) ball)
         )
         ((> (calcFitness (car defenses) ball) (calcFitness (car bestDefenses) ball) )
             (defenseFitness (append (cdr defenses) bestDefenses ) (list (car defenses)) ball)
         )
     )
-)
-
-(define (fusePlayers oldPlayer newPlayer)
-  (print "Soy una funcion que conserva posiciones iniciales y finales")
 )
 
 (define(midFitness mids bestMids ball)
@@ -300,7 +339,7 @@
             (midFitness (cdr mids) (list (car mids)) ball)
         )
         ((<= (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
-            (midFitness (cdr mids) (cons (car bestMids) bestMids) ball)
+            (midFitness (cdr mids) (append bestMids (list(fusePlayers (car mids) (car bestMids)))) ball)
         )
         ((> (calcFitness (car mids) ball) (calcFitness (car bestMids) ball) )
             (midFitness (append (cdr mids) bestMids ) (list (car mids)) ball)
@@ -317,7 +356,7 @@
             (forwFitness (cdr forwards) (list (car forwards)) ball)
         )
         ((<= (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
-            (forwFitness (cdr forwards) (cons (car bestForwards) bestForwards) ball)
+            (forwFitness (cdr forwards) (append bestForwards (list(fusePlayers (car forwards) (car bestForwards)))) ball)
         )
         ((> (calcFitness (car forwards) ball) (calcFitness (car bestForwards) ball) )
             (forwFitness (append (cdr forwards) bestForwards ) (list (car forwards)) ball)
@@ -325,6 +364,20 @@
     )
 )
 
+;;Method that implants the best qualities of the best player
+;;into another player, keeping positions
+(define (fusePlayers oldPlayer newPlayer)
+    (list 
+        (getSpeed newPlayer) 
+        (getStrength newPlayer) 
+        (getXi oldPlayer) 
+        (getYi oldPlayer) 
+        (getXf oldPlayer) 
+        (getYf oldPlayer) 
+        (getAbility newPlayer) 
+        (getRole newPlayer) 
+    )
+)
 
 ;;Función que crea la bola
 (define (ball pos_X pos_Y)
@@ -396,6 +449,79 @@
         )    
     )
 )
+
+;;Method that gets the speed of a player
+(define (getSpeed member)
+    (getComposition member 0)
+)
+
+;;Method that gets the strength of a player
+(define (getStrength member)
+    (getComposition member 1)
+)
+
+;;Method that gets the initial X of a player
+(define (getXi member)
+    (getComposition member 2)
+)
+
+;;Method that gets the initial Y of a player
+(define (getYi member)
+    (getComposition member 3)
+)
+
+;;Method that gets the final X of a player
+(define (getXf member)
+    (getComposition member 4)
+)
+
+;;Method that gets the final Y of a player
+(define (getYf member)
+    (getComposition member 5)
+)
+
+;;Method that gets the ability of a player
+(define (getAbility member)
+    (getComposition member 6)
+)
+
+;;Method that gets the role of a player
+(define (getRole member)
+    (getComposition member 7)
+)
+
+;;Method that checks if a player is a goalie
+(define (isGoalie member)
+    (cond
+        ((equal? (getRole member) 0) #t)
+        (else #f)
+    )
+)
+
+;;Method that checks if a player is a defense
+(define (isDefense member)
+    (cond
+        ((equal? (getRole member) 1) #t)
+        (else #f)
+    )
+)
+
+;;Method that checks if a player is a midfield
+(define (isMid member)
+    (cond
+        ((equal? (getRole member) 2) #t)
+        (else #f)
+    )
+)
+
+;;Method that checks if a player is a forward
+(define (isForward member)
+    (cond
+        ((equal? (getRole member) 3) #t)
+        (else #f)
+    )
+)
+
 ;;Random de Posición
 (define (randPosY)
     (random 0 (- height 40))
@@ -530,8 +656,8 @@
          void)
         (else
       (begin
-        (display bola)
-        (bolaG (car bola) (car (cdr bola)) 'r)
+        ;;(display bola)
+        (bolaG (car bola) (car (cdr bola)) 'r);Saca el X y Y
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
         (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
         (transformar (cdr AliG1) (cdr AliG2) bola))
@@ -539,4 +665,4 @@
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 5)
+(CCCE2019 '(4 4 2) '(5 3 2) 20)
