@@ -61,7 +61,7 @@
             (interfazCancha)
             ;;Grafica los 2 equipos y la bola
             (sleep 2)
-            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball) (Fitness Team2 '() '() fball) (update fball Team1 Team2) (- Generations 1)))            
+            ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))            
             (bolaG (car fball) (car (cdr fball)) 5) 
         )
     )
@@ -735,7 +735,7 @@
          void)
         (else
       (begin
-        (display bola)
+        ;;(display bola)
         (bolaG (car bola) (car (cdr bola)) 5)
         ;(teclado (car bola) (car(cdr bola)) 'up)
         (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
