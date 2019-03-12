@@ -164,13 +164,13 @@
 
 ;;Method that mutate players, giving them more favorable characteristics.
 ;;+0 o +-1 a las caracteristicas basicas
-(define (mutate players newPlayers ball)
+(define (mutate players newPlayers ball nTeam)
     (cond
         ((null? players)
             newPlayers
         )
         ((null? newPlayers)
-            (mutate (cdr players) (list (car players)) ball)
+            (mutate (cdr players) (list (car players)) ball nTeam)
         )
         (else
             (mutate 
@@ -181,13 +181,13 @@
                         (mutateStrength (car players) (random -2 3)) 
                         (getXf (car players)) 
                         (getYf (car players)) 
-                        (newXf (car players) ball (getSpeed (car players)) (getXf (car players)))
+                        (newXf (car players) ball (getSpeed (car players)) (getXf (car players)) nTeam)
                         (newYf (car players) ball (getSpeed (car players)) (getYf (car players)))
                         (mutateAbility (car players) (random -2 3))
                         (getComposition (car players) 7)
                     ))
                 )
-                ball
+                ball nTeam
             )    
         )
     )
@@ -233,20 +233,110 @@
 )
 
 ;;Method that decides the new X position of the player
-(define (newXf member ball iterations result)
+(define (newXf member ball iterations result nTeam)
     (cond
         ((zero? iterations)
-            result
+            (cond
+                ((equal? nTeam 1)
+                    (cond
+                        ((isDefense member)
+                            (applyZone1Limit result)
+                        )
+                        ((isMid member)
+                            (applyZone2Limit result)
+                        )
+                        ((isForward member)
+                            (applyZone3Limit result)
+                        )
+                    )
+                )
+                (else
+                    (cond
+                        ((isDefense member)
+                            (applyZone3Limit result)
+                        )
+                        ((isMid member)
+                            (applyZone2Limit result)
+                        )
+                        ((isForward member)
+                            (applyZone1Limit result)
+                        )
+                    )
+                )
+            )
         )
         ((< (car ball) (getXf member))
-            (newXf member ball (- iterations 1) (- result 2))
+            (newXf member ball (- iterations 1) (- result 1) nTeam)
         )
         ((> (car ball) (getXf member))
-            (newXf member ball (- iterations 1) (+ result 2))
+            (newXf member ball (- iterations 1) (+ result 1) nTeam)
         )
         ((equal? (car ball) (getXf member))
-            result
+            (cond
+                ((equal? nTeam 1)
+                    (cond
+                        ((isDefense member)
+                            (applyZone1Limit result)
+                        )
+                        ((isMid member)
+                            (applyZone2Limit result)
+                        )
+                        ((isForward member)
+                            (applyZone3Limit result)
+                        )
+                    )
+                )
+                (else
+                    (cond
+                        ((isDefense member)
+                            (applyZone3Limit result)
+                        )
+                        ((isMid member)
+                            (applyZone2Limit result)
+                        )
+                        ((isForward member)
+                            (applyZone1Limit result)
+                        )
+                    )
+                )
+            )
         )
+    )
+)
+
+(define (applyZone1Limit number)
+    (cond
+        ((<= number 50)
+            50
+        )
+        ((>= number 350)
+            350
+        )
+        (else number)
+    )
+)
+
+(define (applyZone2Limit number)
+    (cond
+        ((<= number 350)
+            350
+        )
+        ((>= number 650)
+            650
+        )
+        (else number)
+    )
+)
+
+(define (applyZone3Limit number)
+    (cond
+        ((<= number 650)
+            650
+        )
+        ((>= number 950)
+            950
+        )
+        (else number)
     )
 )
 
@@ -256,10 +346,10 @@
             result
         )
         ((< (car (cdr ball)) (getYf member))
-            (newYf member ball (- iterations 1) (- result 2))
+            (newYf member ball (- iterations 1) (- result 5))
         )
         ((> (car (cdr ball)) (getYf member))
-            (newYf member ball (- iterations 1) (+ result 2))
+            (newYf member ball (- iterations 1) (+ result 5))
         )
         ((equal? (car (cdr ball)) (getYf member))
             result
@@ -302,7 +392,7 @@
 (define (Fitness team newTeam subteam bola nTeam)
     (cond
         ((null? team)
-            (mutate newTeam '() bola)
+            (mutate newTeam '() bola nTeam)
         )
         ((isGoalie (car team))
             (Fitness (cdr team) (list(car team)) '() bola nTeam)
@@ -423,7 +513,7 @@
         )     
         ;;Comprueba si el equipo 1 le pegó.
         ((> (Compare_force fball Team1) 0)
-            (ball (+ (car fball) (Compare_force fball Team1)) (car (cdr fball)))
+            (ball (- (car fball) (Compare_force fball Team1)) (car (cdr fball)))
         )
         ((> (Compare_force fball Team2) 0)
             (ball (+ (car fball) (Compare_force fball Team2)) (car (cdr fball)))
@@ -445,10 +535,10 @@
             (cond
                 (
                     (and
-                        (equal? (getComposition (car Team) 4) (car fball));Pos X
-                        (equal? (getComposition (car Team) 5) (car (cdr fball)));Pos Y
+                        (isInXRange fball (car Team));Pos X
+                        (isInYRange fball (car Team));Pos Y
                     )
-                    (getComposition (car Team) 1);Force
+                    (* 3 (getComposition (car Team) 1));Force
                 )
                 (else
                     (Compare_force fball (cdr Team))
@@ -457,6 +547,21 @@
         )
     )
 )
+
+(define (isInXRange ball member)
+    (cond
+        ((and (<= (getXf member) (+ 2 (car ball))) (>= (getXf member) (- 2 (car ball))) ) #t)
+        (else #f)
+    )
+)
+
+(define (isInYRange ball member)
+    (cond
+        ((and (<= (getYf member) (+ 2 (car (cdr ball)))) (>= (getYf member) (- 2 (car (cdr ball)))) ) #t)
+        (else #f)
+    )
+)
+
 ;;Atributo de los jugadores
 ;pos = 0 para Speed.
 ;pos = 1 para Strength
@@ -696,4 +801,4 @@
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 20)
+(CCCE2019 '(4 4 2) '(5 3 2) 100)
