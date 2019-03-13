@@ -50,15 +50,7 @@
 )
 ;;Funtion of the game
 (define (Game Team1 Team2 fball Generations)
-  ;;(display "Generation:")
-  ;;(print Generations)
-  ;;(display "\n")
-  ;;(display "Team1\n")
-  ;;(print Team1)
-  ;;(display "\n")(+ ScoreTeam1 4)
-  ;;(display "Team2\n")
-  ;;(print Team2)
-  ;;(display "\n")
+
     (cond
         ((zero? Generations)
             (FieldGUI)
@@ -72,7 +64,7 @@
                  ;; Review Update movement
                     (+ ScoreTeam2 1)
                     (FieldGUI)
-                    ;;Made the GUI and the bol
+                    ;;Made the GUI and the ball
                     ;(sleep 2)
                     ((Transform Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
                            
@@ -537,33 +529,35 @@
 (define (ball pos_X pos_Y)
     (list pos_X pos_Y)
 )
-;;Funtion that update the position of the ball 
+;;Method that updates the ball position
 (define (update fball Team1 Team2)
     (cond
-        ;;Check if the Team1 and Team2 push the ball
-        ((and (zero? (Compare_force fball Team1))(zero? (Compare_force fball Team2)))
+        ;;Checks if any of the teams hit the ball
+        ((and (zero? (car (Compare_force fball Team1)))(zero? (car (Compare_force fball Team2))))
             fball
         )     
-        ;;Check if the Team1  push the ball
-        ((> (Compare_force fball Team1) 0)
-            (ball (+ (car fball) (Compare_force fball Team1)) (car (cdr fball)))
+        ;;Compares the strength of the player(s) that hit the ball
+        ((> (car (Compare_force fball Team1)) (car (Compare_force fball Team2)))
+            (ball (moveBallX (Compare_force fball Team1) 1 (car fball))  (moveBallY (Compare_force fball Team1) 1 (car (cdr fball))))
         )
-        ((> (Compare_force fball Team2) 0)
-            (ball (- (car fball) (Compare_force fball Team2)) (car (cdr fball)))
+        ((< (car (Compare_force fball Team1)) (car (Compare_force fball Team2)))
+            (ball (moveBallX (Compare_force fball Team2) 2 (car fball))  (moveBallY (Compare_force fball Team2) 2 (car (cdr fball))))
         )
-        ;;Check if the Team2 push the ball
+        ((equal? (car (Compare_force fball Team1)) (car (Compare_force fball Team2)))
+            fball
+        )
         (else
-            (print "Caso no admitido")
             fball
         ) 
     )
 )
 
-;; Function that compares if the team hit you. Returns 0 if they did not hit him, in case they hit him, he returns the strength of the one who hit him.
+;;Method that returns a list with the strength and ability of the player that hit the ball
+;;returns zero if no one hit it
 (define (Compare_force fball Team)
     (cond
         ((null? Team)
-            0
+            '(0 0)
         )
         (else
             (cond
@@ -572,7 +566,7 @@
                         (isInXRange fball (car Team));Pos X
                         (isInYRange fball (car Team));Pos Y
                     )
-                    (* 3 (getComposition (car Team) 1));Force
+                    (list (* 3 (getStrength (car Team))) (* 3 (getAbility (car Team))));Force
                 )
                 (else
                     (Compare_force fball (cdr Team))
@@ -595,7 +589,37 @@
         (else #f)
     )
 )
+;;Method that moves the ball in the x axis
+(define (moveBallX powerAability nTeam result)
+    (cond
+        ((equal? nTeam 1)
+            (+ result (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))))
+        )
+        ((equal? nTeam 2)
+            (- result (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))))
+        )
+    )
+)
 
+;;Method that checks if the ball is in the Y boundaries of the field
+(define (checkBoundaries yVal)
+    (cond
+        ((> yVal 500)
+            (- 500 (- yVal 500))
+        )
+        ((< yVal 0)
+            (abs yVal)
+        )
+        (else
+            yVal
+        )
+    )
+)
+
+;;Method that moves the ball in the y axis
+(define (moveBallY powerAability nTeam result)
+    (checkBoundaries (+ result (* (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))) (random -1 2)) ))
+)
 ;; Players attribute
 ; pos = 0 for Speed.
 ; pos = 1 for Strength
@@ -808,4 +832,4 @@
      )
   )
 ;;Juego
-(CCCE2019 '(4 4 2) '(5 3 2) 50)
+(CCCE2019 '(4 4 2) '(5 3 2) 1000)
