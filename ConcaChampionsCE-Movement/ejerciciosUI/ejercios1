@@ -1,0 +1,30 @@
+#lang racket
+(require racket/gui/base)
+
+
+;Crear un Frame de 500x500
+(define FRAME (new frame% [label "ConcaChampionsCE"] [width 200] [height 200] ))
+;Muestra mensaje en pantalla
+(define msg (new message% [parent FRAME] [label "Bienvenidos al juego"]))
+(define msg1 (new message% [parent FRAME] [label "Marcador"] ))
+;Muestra un boton para mostrar el juego
+;Esto puede servir para setear cuando un juegador anota un gol y se quiera mostrar
+(new button% [parent FRAME] [label "Iniciemos"]
+     [callback (lambda (button event)
+                 (send msg set-label "Juego"))])
+;Con la siguiente funcion siempre mostramos un msj
+;Con set-label se puede cambiar el contenido del mensaje
+(send msg1 show #t )
+;Canvas
+(define canvas1 (new canvas% [parent FRAME] [paint-callback
+                             (lambda (canvas dc)
+                               (send dc set-scale 5 5)
+                               (send dc set-text-foreground "yellow")
+                               ;(send dc )
+                               (send dc draw-text "Holi" 0 0)
+                               )]))
+(send canvas1 get-canvas-background)
+
+;Ejecuta el frame para que se muestre
+(send FRAME fullscreen #f)
+(send FRAME show #t)
