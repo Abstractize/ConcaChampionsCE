@@ -26,6 +26,8 @@
 ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
 
 ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
+((draw-string CampoJugadores) (make-posn 1010 120) ScoreTeam1)
+((draw-string CampoJugadores) (make-posn 1010 120) ScoreTeam2)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
