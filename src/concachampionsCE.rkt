@@ -50,7 +50,7 @@
 )
 ;;Funtion of the game
 (define (Game Team1 Team2 fball Generations)
-
+  
     (cond
         ((zero? Generations)
             (FieldGUI)
@@ -60,13 +60,21 @@
         (else
             (cond
                 ((goal fball)
-                 ;;Change the Fitness for the positions.
-                 ;; Review Update movement
-                    (+ ScoreTeam2 1)
-                    (FieldGUI)
-                    ;;Made the GUI and the ball
-                    ;(sleep 2)
-                    ((Transform Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
+                    (cond ((equal? 3 (abs (- ScoreTeam1 ScoreTeam2)))
+                        ((Transform Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) 0))
+                    )
+                          (else
+                           ;;Change the Fitness for the positions.
+                           ;; Review Update movement
+                           (+ ScoreTeam2 1)
+                           (FieldGUI)
+                           ;;Made the GUI and the ball
+                           ;(sleep 2)
+                           ((Transform Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1))) 
+                           )
+                    )
+                
+                            
                            
                 )
                 (else
@@ -91,7 +99,7 @@
 ;; Returns 0 if there was no goal, 1 if team 1 scored a goal and 2 if team 2 scored a goal
 (define (goal fball)
     (cond
-        ((<= (car fball) 0)
+        ((<= (car fball) 50)
             (set! ScoreTeam2 (+ ScoreTeam2 1))
            
             #t
@@ -188,14 +196,14 @@
 )
 
 ;;Method that mutate players, giving them more favorable characteristics.
-;;+0 o +-1 a las caracteristicas basicas
+;;+0 o +-1 to basic characteristics (Speed, strength, and ability)
 (define (mutate players newPlayers ball nTeam)
     (cond
         ((null? players)
             newPlayers
         )
         ((null? newPlayers)
-            (mutate (cdr players) (list (car players)) ball nTeam)
+            (mutate (cdr players) (mutateGoalie (car players) ball) ball nTeam)
         )
         (else
             (mutate 
@@ -216,6 +224,19 @@
             )    
         )
     )
+)
+;;Specific method that mutates the goalkeeper
+(define (mutateGoalie gk ball)
+    (list(player 
+        (mutateSpeed gk (random -2 3)) 
+        (mutateStrength gk (random -2 3)) 
+        (getXf gk) 
+        (getYf gk) 
+        (getXf gk)
+        (newYf gk ball (getSpeed gk) (getYf gk))
+        (mutateAbility gk (random -2 3))
+        (getComposition gk 7)
+    ))
 )
 
 ;;Method that mutates the speed of a player
@@ -256,6 +277,7 @@
         (else (+ value (getAbility member)))
     )
 )
+
 
 ;;Method that decides the new X position of the player
 (define (newXf member ball iterations result nTeam)
@@ -458,7 +480,8 @@
        (else -1)
     )
 )
-;Funtion that define fitness for defenses
+
+;;Specific function that determines the fitness of defenses
 (define(defenseFitness defenses bestDefenses ball)
     (cond
         ((null? defenses)
@@ -475,7 +498,8 @@
         )
     )
 )
-;Funtion that define fitness for midField
+
+;;Specific function that determines the fitness of midfields
 (define(midFitness mids bestMids ball)
     (cond
         ((null? mids)
@@ -492,7 +516,8 @@
         )
     )
 )
-;Funtion that define fitness for forwards
+
+;;Specific function that determines the fitness of forwards
 (define(forwFitness forwards bestForwards ball)
     (cond
         ((null? forwards)
@@ -525,7 +550,7 @@
     )
 )
 
-;;Funtion that create the ball
+;;Method that creates the ball
 (define (ball pos_X pos_Y)
     (list pos_X pos_Y)
 )
@@ -576,6 +601,7 @@
     )
 )
 
+;;Method that checks if a player is in X range of the ball
 (define (isInXRange ball member)
     (cond
         ((and (<= (getXf member) (+ 2 (car ball))) (>= (getXf member) (- 2 (car ball))) ) #t)
@@ -583,12 +609,14 @@
     )
 )
 
+;;Method that checks if a player is in Y range of the ball
 (define (isInYRange ball member)
     (cond
         ((and (<= (getYf member) (+ 2 (car (cdr ball)))) (>= (getYf member) (- 2 (car (cdr ball)))) ) #t)
         (else #f)
     )
 )
+
 ;;Method that moves the ball in the x axis
 (define (moveBallX powerAability nTeam result)
     (cond
@@ -620,6 +648,7 @@
 (define (moveBallY powerAability nTeam result)
     (checkBoundaries (+ result (* (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))) (random -1 2)) ))
 )
+
 ;; Players attribute
 ; pos = 0 for Speed.
 ; pos = 1 for Strength
