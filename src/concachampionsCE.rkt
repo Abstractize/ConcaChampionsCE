@@ -10,35 +10,35 @@
 (define height 500)
 (define width 1000)
 
-(define ScoreTeam1 0)
+(define  ScoreTeam1 0)
 (define ScoreTeam2 0)
 
 ;main window of the court
 (define ventanaPrincipal (open-viewport "Cancha" 1200 500))
 
 ; hidden window to define the limits of players
-(define CampoJugadores (open-pixmap  "PorteroG1"  1200 500))
+(define PlayersField (open-pixmap  "PorteroG1"  1200 500))
 ;Funtion that define the graphics interface in the project
-(define (interfazCancha)
-((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
-((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
-((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
-((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
-((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
-((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
+(define (FieldGUI)
+  ((draw-solid-rectangle PlayersField) (make-posn 1000 0) 200 500 "darkgray")
+  ((draw-string PlayersField) (make-posn 1100 20) "Tarea #1 Lenguajes")
+  ((draw-string PlayersField) (make-posn 1010 30) "Estudiantes:")
+  ((draw-string PlayersField) (make-posn 1030 50) "Bertha Brenes (2017101642)")
+  ((draw-string PlayersField) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
+  ((draw-string PlayersField) (make-posn 1030 90) "Maria Avila (2014089607)")
 
-((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-((draw-string CampoJugadores) (make-posn 1010 140) (~a ScoreTeam1 #:min-width 20 #:align 'center
-                #:left-pad-string "Equipo 1:    ") )
-  ((draw-string CampoJugadores) (make-posn 1010 160) (~a ScoreTeam2 #:min-width 20 #:align 'center
-                #:left-pad-string "Equipo 2:    ") )
-((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
-((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
-((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
-(void)
+  ((draw-string PlayersField) (make-posn 1010 120) "Marcador:")
+  ((draw-string PlayersField) (make-posn 1010 140) "Equipo 1:")
+  ((draw-string PlayersField) (make-posn 1060 140) (~r ScoreTeam1 ) )
+  ((draw-string PlayersField) (make-posn 1010 160) "Equipo 2:")
+  ((draw-string PlayersField) (make-posn 1060 160) (~r ScoreTeam2) )
+  ((clear-solid-rectangle PlayersField) (make-posn 1000 0) 4 500)
+  ((clear-solid-rectangle PlayersField) (make-posn 1000 100) 200 4)
+  ((draw-pixmap PlayersField) "cancha.bmp" (make-posn 0 0))
+  (void)
 )
-((draw-pixmap CampoJugadores) "bola.png" (make-posn 500 220))
-(interfazCancha)
+((draw-pixmap PlayersField) "bola.png" (make-posn 500 220))
+(FieldGUI)
 
 
 
@@ -55,14 +55,14 @@
   ;;(display "\n")
   ;;(display "Team1\n")
   ;;(print Team1)
-  ;;(display "\n")
+  ;;(display "\n")(+ ScoreTeam1 4)
   ;;(display "Team2\n")
   ;;(print Team2)
   ;;(display "\n")
     (cond
         ((zero? Generations)
-            (interfazCancha)
-            (transformar Team1 Team2 fball)
+            (FieldGUI)
+            (Transform Team1 Team2 fball)
             (print "Exit")
         )
         (else
@@ -70,22 +70,24 @@
                 ((goal fball)
                  ;;Change the Fitness for the positions.
                  ;; Review Update movement
-                    ((interfazCancha)
-                    ;;Grafica los 2 equipos y la bola
+                    (+ ScoreTeam2 1)
+                    (FieldGUI)
+                    ;;Made the GUI and the bol
                     ;(sleep 2)
-                    ((transformar Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
-                    )       
+                    ((Transform Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
+                           
                 )
                 (else
-                    (interfazCancha)
-                    ;;Grafica los 2 equipos y la bola
+                    (FieldGUI)
+                    ;;Made the GUI with the two teams
                     ;(sleep 2)
-                    ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))
+                    ((Transform Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))
                 )   
             )            
         )
     )
 )
+
 ;;Function that creates the players.
 ;; Role = 0 Goalkeeper
 ;; Role = 1 Defense
@@ -98,11 +100,13 @@
 (define (goal fball)
     (cond
         ((<= (car fball) 0)
-            (+ ScoreTeam2 1)
+            (set! ScoreTeam2 (+ ScoreTeam2 1))
+           
             #t
         ) 
         ((>= (car fball) 990)
-            (+ ScoreTeam1 1)
+            (set! ScoreTeam1 (+ ScoreTeam1 1))
+           
             #t
         )
         (else
@@ -114,13 +118,13 @@
 ;; Recursive function that creates a list with a team.
 (define (First_Gen players team num)
     (cond
-        ;;Equipo vacío
+        ;;Empty Team
         ((null? team)
             (reverse players)
         )
         (else
             (cond
-                ;;0 al inicio de la lista?
+                ;;0 at the begging of the list?
                 ((zero? (car team))
                     (First_Gen players (cdr team) num)
                 )
@@ -462,7 +466,7 @@
        (else -1)
     )
 )
-
+;Funtion that define fitness for defenses
 (define(defenseFitness defenses bestDefenses ball)
     (cond
         ((null? defenses)
@@ -479,7 +483,7 @@
         )
     )
 )
-
+;Funtion that define fitness for midField
 (define(midFitness mids bestMids ball)
     (cond
         ((null? mids)
@@ -496,7 +500,7 @@
         )
     )
 )
-
+;Funtion that define fitness for forwards
 (define(forwFitness forwards bestForwards ball)
     (cond
         ((null? forwards)
@@ -529,25 +533,25 @@
     )
 )
 
-;;Función que crea la bola
+;;Funtion that create the ball
 (define (ball pos_X pos_Y)
     (list pos_X pos_Y)
 )
-;;Funcion que actualiza la bola
+;;Funtion that update the position of the ball 
 (define (update fball Team1 Team2)
     (cond
-        ;;Comprueba si el equipo 1 y el 2 le pegaron
+        ;;Check if the Team1 and Team2 push the ball
         ((and (zero? (Compare_force fball Team1))(zero? (Compare_force fball Team2)))
             fball
         )     
-        ;;Comprueba si el equipo 1 le pegó.
+        ;;Check if the Team1  push the ball
         ((> (Compare_force fball Team1) 0)
             (ball (+ (car fball) (Compare_force fball Team1)) (car (cdr fball)))
         )
         ((> (Compare_force fball Team2) 0)
             (ball (- (car fball) (Compare_force fball Team2)) (car (cdr fball)))
         )
-        ;;Comprueba si el equipo 2 le pegó.
+        ;;Check if the Team2 push the ball
         (else
             (print "Caso no admitido")
             fball
@@ -688,20 +692,20 @@
     )
 )
 
-;;Random de Posición
+;;Random of position
 (define (randPosY)
     (random 0 (- height 40))
 )
-;;Función de random de 1 a 10
+;;Funtion made a random from 1 to 10
 (define (rand)
     (random 1 11)
 )
-;;Resta 1 al primero
+;;Subtraction 1 of the first
 (define (minus1 lista)
     (cons (- (car lista) 1) (cdr lista))
 )
-;;Funciones para listas
-;;Largo
+;;Funtions for lists
+;;Lenght
 (define(lenght lista)
     (lenght_aux lista 0)
 )
@@ -715,7 +719,7 @@
         )
     )
 )
-;;Reversa
+;;Reverse
 (define (reverse lst)
     (cond 
         ((null? lst)
@@ -726,7 +730,7 @@
         )
     )
 )
-;;Combinar
+;;Append
 (define (append l1 l2)
     (cond 
         ((null? l1) 
@@ -739,19 +743,19 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Diseno Grafico ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;; UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Creation of players
 ; posx => position in x
 ; posy => position in and
-(define (jugadoresG1 posx posy lad )
+(define (PlayersG1 posx posy lad )
   (if (equal? lad 'u)
-      ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+      ((draw-pixmap PlayersField) "defensa.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+          ((draw-pixmap PlayersField) "defensa.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+              ((draw-pixmap PlayersField) "defensa.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
+                  ((draw-pixmap PlayersField) "defensa.png" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -759,75 +763,25 @@
       )
  )
   
- (copy-viewport CampoJugadores ventanaPrincipal)
-  ;((clear-viewport CampoJugadores))
+ (copy-viewport PlayersField ventanaPrincipal)
   )
-;Bola
-(define (teclado posx posy press)
 
-;limite derecha
- (if (> posx 980)
-    (begin
-       (bolaG 980 posy 'd)
-      (teclado 980 posy (key-value(get-key-press ventanaPrincipal))))
- ;limite de la izquiera TODO un parametro
-  (if (< posx 10)
-      (begin
-        (bolaG 20 posy 'r)
-        (teclado 20 posy (key-value(get-key-press ventanaPrincipal)) ))
-      ;limite arriba
-  (if (< posy 0)
-      (begin
-        (bolaG posx 0 'u)
-        (teclado posx 0 (key-value(get-key-press ventanaPrincipal))))
-      ;limite de abajo
-  (if (> posy 490)
-      (begin
-        (bolaG posx  490 'd)
-        (teclado posx 490 (key-value(get-key-press ventanaPrincipal))))    
-  (if (equal? press 'up)
-      (begin
-        (bolaG posx posy 'u)
-        (teclado posx (- posy 10) (key-value (get-key-press ventanaPrincipal))))
-      (if (equal? press 'down)
-          (begin
-            (bolaG posx posy 'd)
-            (teclado  posx (+ posy 10) (key-value (get-key-press ventanaPrincipal))))
-      (if (equal? press 'left)
-          (begin
-            (bolaG posx posy 'l)
-            (teclado (- posx 10) posy (key-value (get-key-press ventanaPrincipal))))
-      (if (equal? press 'right)
-          (begin
-            (bolaG posx posy 'r)
-            (teclado  (+ posx 10) posy (key-value (get-key-press ventanaPrincipal)) ))
-          ;else
-          (teclado  posx posy (key-value (get-key-press ventanaPrincipal)))
-          )
-    )
-      )
-      )
-  )
-  ))
-  )
-  )
   
-(define (bolaG posx posy)
-      ((draw-pixmap CampoJugadores) "bola.png" (make-posn posx posy))
+(define (ballG posx posy)
+      ((draw-pixmap PlayersField) "bola.png" (make-posn posx posy))
      
- (copy-viewport CampoJugadores ventanaPrincipal)
-  ;((clear-viewport CampoJugadores))
+ (copy-viewport PlayersField ventanaPrincipal)
 )
   ;Jugadores G2
-  (define (jugadoresG2 posx posy lad )
+  (define (PlayersG2 posx posy lad )
   (if (equal? lad 'u)
-      ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+      ((draw-pixmap PlayersField) "delantero.png" (make-posn posx posy))
       (if (equal? lad 'd)
-          ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+          ((draw-pixmap PlayersField) "delantero.png" (make-posn posx posy))
           (if (equal? lad 'l)
-              ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+              ((draw-pixmap PlayersField) "delantero.png" (make-posn posx posy))
               (if (equal? lad 'r)
-                  ((draw-pixmap CampoJugadores) "delantero.png" (make-posn posx posy))
+                  ((draw-pixmap PlayersField) "delantero.png" (make-posn posx posy))
                   ;else
                   (void)
                   )
@@ -835,21 +789,20 @@
       )
  )
   
- (copy-viewport CampoJugadores ventanaPrincipal)
-  ;((clear-viewport CampoJugadores))
+ (copy-viewport PlayersField ventanaPrincipal)
   )
   ;transformar
-  (define (transformar AliG1 AliG2 bola)
+  (define (Transform AliG1 AliG2 bola)
   (cond ((and (null? AliG1) (null? AliG2))
-         (bolaG (car bola) (car (cdr bola)))
+         (ballG (car bola) (car (cdr bola)))
          void)
         (else
       (begin      
         ;(teclado (car bola) (car(cdr bola)) 'up)
-        (jugadoresG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
-        (jugadoresG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
+        (PlayersG1 (getComposition (car AliG1) 4) (getComposition (car AliG1) 5) 'r)
+        (PlayersG2 (getComposition (car AliG2) 4) (getComposition (car AliG2) 5)  'r)
         
-        (transformar (cdr AliG1) (cdr AliG2) bola))
+        (Transform (cdr AliG1) (cdr AliG2) bola))
         
       )
      )
