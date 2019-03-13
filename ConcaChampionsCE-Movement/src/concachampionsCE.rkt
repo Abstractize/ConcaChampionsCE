@@ -1,32 +1,31 @@
 #lang racket
 (require (lib "graphics.ss" "graphics"))
 (require 2htdp/universe)
-;;(require htdp/draw)
 (open-graphics)
 
-;;Constantes de Interfaz
+;;Window constants
 (define height 500)
 (define width 1000)
 
 (define ScoreTeam1 0)
 (define ScoreTeam2 0)
 
-;ventana principal de la cancha
+;;Main Window
 (define ventanaPrincipal (open-viewport "Cancha" 1200 500))
 
-;ventana ocultas para definir los limites de jugadores
+;;hidden windows that define the limits of players
 (define CampoJugadores (open-pixmap  "PorteroG1"  1200 500))
 (define (interfazCancha)
 ((draw-solid-rectangle CampoJugadores) (make-posn 1000 0) 200 500 "darkgray")
-;Portada
+;;Authors
 ((draw-string CampoJugadores) (make-posn 1100 20) "Tarea #1 Lenguajes")
 ((draw-string CampoJugadores) (make-posn 1010 30) "Estudiantes:")
 ((draw-string CampoJugadores) (make-posn 1030 50) "Bertha Brenes (2017101642)")
 ((draw-string CampoJugadores) (make-posn 1030 70) "Gabriel Abarca (2017110442)")
 ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
-;Marcador
+;;Score
 ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-;Delimitadoress
+;Limiters
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
@@ -43,17 +42,8 @@
 (sleep 3)
     (Game (First_Gen '() (cons 1 Team1) 0) (First_Gen '() (cons 1 Team2) 1) (ball 495 245) Generations)
 )
-;;Función de juego
+;;Main game function
 (define (Game Team1 Team2 fball Generations)
-  ;;(display "Generation:")
-  ;;(print Generations)
-  ;;(display "\n")
-  ;;(display "Team1\n")
-  ;;(print Team1)
-  ;;(display "\n")
-  ;;(display "Team2\n")
-  ;;(print Team2)
-  ;;(display "\n")
     (cond
         ((zero? Generations)
             (interfazCancha)
@@ -64,32 +54,30 @@
             (cond
                 ((goal fball)
                  ;;Cambiar el Fitness para las posiciones.
-                 ;;Revisar movimiento del Update
                     ((interfazCancha)
-                    ;;Grafica los 2 equipos y la bola
-                    ;(sleep 2)
+                    (sleep 1)
                     ((transformar Team1 Team2 (ball 495 245)) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (ball 495 245) (- Generations 1)))            
                     )       
                 )
                 (else
                     (interfazCancha)
-                    ;;Grafica los 2 equipos y la bola
-                    ;(sleep 2)
+                    (sleep 1)
                     ((transformar Team1 Team2 fball) (Game (Fitness Team1 '() '() fball 1) (Fitness Team2 '() '() fball 2) (update fball Team1 Team2) (- Generations 1)))
                 )   
             )            
         )
     )
 )
-;;Función que crea los jugadores.
-;;Role = 0 Portero
-;;Role = 1 Defensa
-;;Role = 2 Medios
-;;Role = 3 Delantero
+;;Mehtod that creates players
+;;Role = 0 Goal Keeper
+;;Role = 1 Defense
+;;Role = 2 Midfields
+;;Role = 3 Forwards
 (define (player speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
     (list speed strength pos_Xi pos_Yi pos_Xf pos_Yf ability role)
 )
-;;Retorna 0 si no hubo gol, 1 si el equipo 1 metió gol y 2 si el equipo 2 metió gol
+;;Method that scores goals
+;;Return 1 for goal, 0 for no goal
 (define (goal fball)
     (cond
         ((<= (car fball) 0)
@@ -106,16 +94,15 @@
     )    
 )
 
-;;Función recursiva que crea un lista con un equipo.
+;;Method that creates the initial instance of the teams
 (define (First_Gen players team num)
     (cond
-        ;;Equipo vacío
+        ;;Empty team
         ((null? team)
             (reverse players)
         )
         (else
             (cond
-                ;;0 al inicio de la lista?
                 ((zero? (car team))
                     (First_Gen players (cdr team) num)
                 )
@@ -126,7 +113,8 @@
         )            
     )        
 )
-;;Funciones que asignan el siguiente jugador
+
+;;Method that assigns the next player
 (define (characterCreator teamLenght team)
     (cond 
         ((equal? teamLenght 4)
@@ -143,7 +131,8 @@
         )
     )
 )
-;;Funciones que crean los jugadores de acuerdo al equipo
+
+;;Method that create goalkeeper according to team
 (define (goalkeeper team)
     (cond 
         ((zero? team)
@@ -154,6 +143,8 @@
         )
     )
 )
+
+;;Method that create defenses according to team
 (define (defense team)
     (cond 
         ((zero? team)
@@ -164,6 +155,8 @@
         )
     )
 )
+
+;;Method that create midfields according to team
 (define (midfields team)
     (cond 
         ((zero? team)
@@ -174,6 +167,8 @@
         )
     )
 )
+
+;;Method that create forwards according to team
 (define (forwards team)
     (cond 
         ((zero? team)
@@ -186,7 +181,7 @@
 )
 
 ;;Method that mutate players, giving them more favorable characteristics.
-;;+0 o +-1 a las caracteristicas basicas
+;;+0 o +-1 to basic characteristics (Speed, strength, and ability)
 (define (mutate players newPlayers ball nTeam)
     (cond
         ((null? players)
@@ -216,6 +211,7 @@
     )
 )
 
+;;Specific method that mutates the goalkeeper
 (define (mutateGoalie gk ball)
     (list(player 
         (mutateSpeed gk (random -2 3)) 
@@ -340,6 +336,7 @@
     )
 )
 
+;;Method that determines the first third of the field
 (define (applyZone1Limit number)
     (cond
         ((<= number 50)
@@ -352,6 +349,7 @@
     )
 )
 
+;;Method that determines the second third of the field
 (define (applyZone2Limit number)
     (cond
         ((<= number 350)
@@ -364,6 +362,7 @@
     )
 )
 
+;;Method that determines the last third of the field
 (define (applyZone3Limit number)
     (cond
         ((<= number 650)
@@ -376,6 +375,7 @@
     )
 )
 
+;;Method that decides the new Y position of the player
 (define (newYf member ball iterations result)
     (cond
         ((zero? iterations)
@@ -394,37 +394,12 @@
 )
 
 ;;Method that calculates the fitness of a single player
-;;suma de todas las caracteristicas basicas, si la bola esta en la zona que les
-;;corresponde, se considera |Xjugador-Xbola| |Yjugador-Ybola|, de lo contrario
-;;solo |Yjugador-Ybola|
-;;min siystem span: solo considerar Y?
 (define(calcFitness player ball)
     (- (+ (getComposition player 0) (getComposition player 1) (getComposition player 6)) (abs(- (getComposition player 5) (car(cdr ball)))))
 )
 
-;;Función de Aptitud
-;;•	Porteros:
-;;-Goles tapados.
-;;-Alineación con el eje Y de la bola.
-;;solo un portero, por lo tanto se clona y se muta
-
-;;•	Defensas:
-;;-Alineación con la trayectoria de los delanteros contrarios.
-;;-Otra cosa que se le ocurra.
-;;se busca el mejor defensa, se clona y se muta
-  
-;;•	Medios:
-;;-Cercanía a la bola.
-;;- Alineación con la trayectoria de los delanteros contrarios.
-;;se busca el mejor medio, se clona y se muta
-  
-;;•	Delanteros:
-;;-Cercanía a la bola
-;;-Goles Anotados
-;;se busca el mejor delantero, se clona y se muta.
-
-;;Retorna el nuevo equipo.
-;;
+;;Fitness function
+;;Output: team composition with best player cloned
 (define (Fitness team newTeam subteam bola nTeam)
     (cond
         ((null? team)
@@ -470,6 +445,7 @@
     )
 )
 
+;;Specific function that determines the fitness of defenses
 (define(defenseFitness defenses bestDefenses ball)
     (cond
         ((null? defenses)
@@ -487,6 +463,7 @@
     )
 )
 
+;;Specific function that determines the fitness of midfields
 (define(midFitness mids bestMids ball)
     (cond
         ((null? mids)
@@ -504,6 +481,7 @@
     )
 )
 
+;;Specific function that determines the fitness of forwards
 (define(forwFitness forwards bestForwards ball)
     (cond
         ((null? forwards)
@@ -536,18 +514,18 @@
     )
 )
 
-;;Función que crea la bola
+;;Method that creates the ball
 (define (ball pos_X pos_Y)
     (list pos_X pos_Y)
 )
-;;Funcion que actualiza la bola
+;;Method that updates the ball position
 (define (update fball Team1 Team2)
     (cond
-        ;;Comprueba si el equipo 1 y el 2 le pegaron
+        ;;Checks if any of the teams hit the ball
         ((and (zero? (car (Compare_force fball Team1)))(zero? (car (Compare_force fball Team2))))
             fball
         )     
-        ;;Comprueba si el equipo 1 le pegó.
+        ;;Compares the strength of the player(s) that hit the ball
         ((> (car (Compare_force fball Team1)) (car (Compare_force fball Team2)))
             (ball (moveBallX (Compare_force fball Team1) 1 (car fball))  (moveBallY (Compare_force fball Team1) 1 (car (cdr fball))))
         )
@@ -557,13 +535,14 @@
         ((equal? (car (Compare_force fball Team1)) (car (Compare_force fball Team2)))
             fball
         )
-        ;;Comprueba si el equipo 2 le pegó.
         (else
             fball
         ) 
     )
 )
-;;Función que compara si el equipo le pegó. Retorna 0 si no le pegaron, en caso de que le pegaran, retorna la fuerza del que le pegó.
+
+;;Method that returns a list with the strength and ability of the player that hit the ball
+;;returns zero if no one hit it
 (define (Compare_force fball Team)
     (cond
         ((null? Team)
@@ -586,28 +565,7 @@
     )
 )
 
-(define (Compare_Ability fball Team)
-    (cond
-        ((null? Team)
-            0
-        )
-        (else
-            (cond
-                (
-                    (and
-                        (isInXRange fball (car Team));Pos X
-                        (isInYRange fball (car Team));Pos Y
-                    )
-                    (* 1 (getComposition (car Team) 6));Force
-                )
-                (else
-                    (Compare_force fball (cdr Team))
-                )
-            )
-        )
-    )
-)
-
+;;Method that checks if a player is in X range of the ball
 (define (isInXRange ball member)
     (cond
         ((and (<= (getXf member) (+ 2 (car ball))) (>= (getXf member) (- 2 (car ball))) ) #t)
@@ -615,6 +573,7 @@
     )
 )
 
+;;Method that checks if a player is in Y range of the ball
 (define (isInYRange ball member)
     (cond
         ((and (<= (getYf member) (+ 2 (car (cdr ball)))) (>= (getYf member) (- 2 (car (cdr ball)))) ) #t)
@@ -632,9 +591,9 @@
             (- result (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))))
         )
     )
-   ; (print "Soy una funcion que mueve la bola en X")
 )
 
+;;Method that checks if the ball is in the Y boundaries of the field
 (define (checkBoundaries yVal)
     (cond
         ((> yVal 500)
@@ -654,15 +613,15 @@
     (checkBoundaries (+ result (* (* (car powerAability) (cos (* 4.5 (car (cdr powerAability))))) (random -1 2)) ))
 )
 
-;;Atributo de los jugadores
-;pos = 0 para Speed.
-;pos = 1 para Strength
-;pos = 2 para X inicial
-;pos = 3 para Y inicial
-;pos = 4 para X final
-;pos = 5 para Y final
-;pos = 6 para Ability
-;pos = 7 para Role
+;;Method that gets the attributes of the players
+;pos = 0 Speed.
+;pos = 1 Strength
+;pos = 2 Xi
+;pos = 3 Yi
+;pos = 4 Xf
+;pos = 5 Yf
+;pos = 6 Ability
+;pos = 7 Role
 (define (getComposition player pos)
     (cond
         ((null? player)
@@ -750,20 +709,21 @@
     )
 )
 
-;;Random de Posición
+;;Random Y position
 (define (randPosY)
     (random 0 (- height 40))
 )
-;;Función de random de 1 a 10
+;;Random 1-10 pos for player attributes
 (define (rand)
     (random 1 11)
 )
-;;Resta 1 al primero
+;;Method that subtracts 1 from the first
+;;element of the list
 (define (minus1 lista)
     (cons (- (car lista) 1) (cdr lista))
 )
-;;Funciones para listas
-;;Largo
+;;List functions
+;;length
 (define(lenght lista)
     (lenght_aux lista 0)
 )
@@ -777,7 +737,7 @@
         )
     )
 )
-;;Reversa
+;;Reverse
 (define (reverse lst)
     (cond 
         ((null? lst)
@@ -788,7 +748,7 @@
         )
     )
 )
-;;Combinar
+;;Append 2 lists
 (define (append l1 l2)
     (cond 
         ((null? l1) 
@@ -801,11 +761,10 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Diseno Grafico ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Creacion de jugadores
-;posx => posicion en x
-;posy => posicion en y
-;lad => tecla que mueve el jugador, Preguntar al profe(aqui creo que va el algoritmo genetico)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;; Grafic design ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;player creation
+;posx => position in x
+;posy => position in y
 (define (jugadoresG1 posx posy lad )
   (if (equal? lad 'u)
       ((draw-pixmap CampoJugadores) "defensa.png" (make-posn posx posy))
@@ -823,27 +782,26 @@
  )
   
  (copy-viewport CampoJugadores ventanaPrincipal)
-  ;((clear-viewport CampoJugadores))
   )
-;Bola
+;;Ball
 (define (teclado posx posy press)
 
-;limite derecha
+;;right limit
  (if (> posx 980)
     (begin
        (bolaG 980 posy 'd)
       (teclado 980 posy (key-value(get-key-press ventanaPrincipal))))
- ;limite de la izquiera TODO un parametro
+ ;;left limit
   (if (< posx 10)
       (begin
         (bolaG 20 posy 'r)
         (teclado 20 posy (key-value(get-key-press ventanaPrincipal)) ))
-      ;limite arriba
+;;upper limit
   (if (< posy 0)
       (begin
         (bolaG posx 0 'u)
         (teclado posx 0 (key-value(get-key-press ventanaPrincipal))))
-      ;limite de abajo
+  ;;lower limit
   (if (> posy 490)
       (begin
         (bolaG posx  490 'd)
