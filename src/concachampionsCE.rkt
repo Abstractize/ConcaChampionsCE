@@ -1,8 +1,10 @@
 #lang racket
 (require (lib "graphics.ss" "graphics"))
+ (require racket/format)
 (require 2htdp/universe)
 ;;(require htdp/draw)
 (open-graphics)
+
 
 ;Interface Constants
 (define height 500)
@@ -26,8 +28,10 @@
 ((draw-string CampoJugadores) (make-posn 1030 90) "Maria Avila (2014089607)")
 
 ((draw-string CampoJugadores) (make-posn 1010 120) "Marcador:")
-((draw-string CampoJugadores) (make-posn 1010 120) ScoreTeam1)
-((draw-string CampoJugadores) (make-posn 1010 120) ScoreTeam2)
+((draw-string CampoJugadores) (make-posn 1010 140) (~a ScoreTeam1 #:min-width 20 #:align 'center
+                #:left-pad-string "Equipo 1:    ") )
+  ((draw-string CampoJugadores) (make-posn 1010 160) (~a ScoreTeam2 #:min-width 20 #:align 'center
+                #:left-pad-string "Equipo 2:    ") )
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 0) 4 500)
 ((clear-solid-rectangle CampoJugadores) (make-posn 1000 100) 200 4)
 ((draw-pixmap CampoJugadores) "cancha.bmp" (make-posn 0 0))
@@ -383,7 +387,7 @@
 )
 
 ;;Method that calculates the fitness of a single player
-sum of all the basic characteristics, if the ball is in the area that
+;sum of all the basic characteristics, if the ball is in the area that
 ;; corresponds, is considered | Xjugador-Xbola | Yjugador-Ybola |, otherwise
 ;; only | Yjugador-Ybola |
 ;; min siystem span: just consider Y?
